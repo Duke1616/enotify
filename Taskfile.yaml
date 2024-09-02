@@ -1,0 +1,11 @@
+version: '3'
+tasks:
+  default:
+    desc: 命令提示
+    cmds:
+      - task --list-all
+  run:
+    desc: 启动服务
+    cmds:
+      -  EGO_DEBUG=true go run main.go
+

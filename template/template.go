@@ -1,0 +1,83 @@
+package template
+
+import (
+	"html/template"
+	"io"
+	"os"
+	"path"
+	"path/filepath"
+)
+
+type Template struct {
+	template *template.Template
+}
+
+type Option func(text *template.Template)
+
+func newTemplate(options ...Option) (*Template, error) {
+	t := &Template{
+		template: template.New("").Option("missingkey=zero"),
+	}
+
+	for _, o := range options {
+		o(t.template)
+	}
+
+	t.template.Funcs(template.FuncMap(DefaultFuncs))
+
+	return t, nil
+}
+
+func (t *Template) Parse(r io.Reader) error {
+	b, err := io.ReadAll(r)
+	if err != nil {
+		return err
+	}
+
+	if t.template, err = t.template.Parse(string(b)); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func FromGlobs(paths []string, options ...Option) (*Template, error) {
+	t, err := newTemplate(options...)
+	if err != nil {
+		return nil, err
+	}
+
+	defaultTemplates := []string{"default.tmpl", "email.tmpl"}
+	for _, file := range defaultTemplates {
+		f, er := os.Open(path.Join("config", file))
+		if er != nil {
+			return nil, er
+		}
+
+		if er = t.Parse(f); er != nil {
+			f.Close()
+			return nil, er
+		}
+		f.Close()
+	}
+
+	for _, tp := range paths {
+		if er := t.FromGlob(tp); er != nil {
+			return nil, er
+		}
+	}
+	return t, nil
+}
+
+func (t *Template) FromGlob(path string) error {
+	p, err := filepath.Glob(path)
+	if err != nil {
+		return err
+	}
+	if len(p) > 0 {
+		if t.template, err = t.template.ParseGlob(path); err != nil {
+			return err
+		}
+	}
+	return nil
+}
