@@ -6,15 +6,15 @@ type TextMessage struct {
 	Content string `json:"content"`
 }
 
-func NewTextMessage(Builder Receivers, Content string) *TextMessage {
+func NewTextMessage(builder Receivers, content string) *TextMessage {
 	return &TextMessage{
-		Receivers: Builder,
-		Content:   Content,
+		Receivers: builder,
+		Content:   content,
 	}
 }
 
-func (m *TextMessage) ToJSON() (map[string]interface{}, error) {
-	j := map[string]interface{}{
+func (m *TextMessage) ToJSON() (map[string]any, error) {
+	j := map[string]any{
 		"touser":  m.ToUser,
 		"toparty": m.ToParty,
 		"totag":   m.ToTag,
@@ -24,5 +24,6 @@ func (m *TextMessage) ToJSON() (map[string]interface{}, error) {
 			"content": m.Content,
 		},
 	}
+
 	return j, nil
 }

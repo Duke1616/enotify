@@ -3,6 +3,7 @@ package wechat
 import (
 	"context"
 	"enotify/notify"
+	"enotify/notify/wechat/card"
 	"github.com/magiconair/properties/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
@@ -39,9 +40,40 @@ func (s *WechatNotifyTestSuite) TestWechatMessage() {
 		wantResult bool
 	}{
 		{
-			name: "成功发送消息",
+			name: "成功发送消息-文本",
 			req: NewTextMessage(NewReceiversBuilder().SetAgentId(1000004).SetToUser(
-				[]string{"sunwk"}).Build(), "hello world!"),
+				[]string{"LuanKaiZhao"}).Build(), "hello world!"),
+			wantResult: true,
+		},
+		{
+			name: "成功发送消息-markdown",
+			req: NewMarkdownMessage(NewReceiversBuilder().SetAgentId(1000004).SetToUser(
+				[]string{"LuanKaiZhao"}).Build(), "## 这是一个Markdown消息\n\n**加粗** 和 *斜体*"),
+			wantResult: true,
+		},
+		{
+			name: "成功发送消息-card",
+			req: NewCardMessage(NewReceiversBuilder().SetAgentId(1000004).SetToUser(
+				[]string{"LuanKaiZhao"}).Build(), card.NewButtonCardBuilder().SetToMailTitle(
+				card.NewMailTitle("Example Title", "Example Description")).
+				SetSelection(card.ButtonSelection{
+					QuestionKey: "btn_question_key1",
+					Title:       "企业微信评分",
+					OptionList: []card.Option{
+						{ID: "btn_selection_id1", Text: "100分"},
+						{ID: "btn_selection_id2", Text: "101分"},
+					},
+					SelectedID: "btn_selection_id1",
+				}).
+				SetButtonList([]card.Button{
+					{Text: "按钮1", Style: 1, Key: "button_key_1"},
+					{Text: "按钮2", Style: 2, Key: "button_key_2"},
+				}).
+				SetContentList([]card.HorizontalContentList{
+					{KeyName: "Key1", Value: "Value1"},
+					{KeyName: "Key2", Value: "Value2"},
+				}).
+				Build()),
 			wantResult: true,
 		},
 	}

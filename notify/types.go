@@ -5,7 +5,7 @@ import (
 )
 
 type NotificationMessage interface {
-	ToJSON() (map[string]interface{}, error)
+	ToJSON() (map[string]any, error)
 }
 
 type Notifier interface {

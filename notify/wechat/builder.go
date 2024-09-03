@@ -15,6 +15,7 @@ type Receivers struct {
 	ToParty string `json:"toparty"`
 	ToTag   string `json:"totag"`
 	AgentId int    `json:"agentid"`
+	MsgType string `json:"msgtype"`
 }
 
 type receiversBuilder struct {

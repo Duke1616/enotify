@@ -4,12 +4,12 @@ type CustomMessage struct {
 	Custom map[string]interface{}
 }
 
-func NewCustomMessage(custom map[string]interface{}) *CustomMessage {
+func NewCustomMessage(custom map[string]any) *CustomMessage {
 	return &CustomMessage{
 		Custom: custom,
 	}
 }
 
-func (m *CustomMessage) ToJSON() (map[string]interface{}, error) {
+func (m *CustomMessage) ToJSON() (map[string]any, error) {
 	return m.Custom, nil
 }
