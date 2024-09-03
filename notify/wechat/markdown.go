@@ -6,8 +6,8 @@ type MarkdownMessage struct {
 	Content string `json:"content"`
 }
 
-func NewMarkdownMessage(builder Receivers, content string) *TextMessage {
-	return &TextMessage{
+func NewMarkdownMessage(builder Receivers, content string) *MarkdownMessage {
+	return &MarkdownMessage{
 		Receivers: builder,
 		Content:   content,
 	}
