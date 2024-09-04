@@ -6,7 +6,7 @@ type CardMessage struct {
 }
 
 type TemplateCard interface {
-	ToMap() (map[string]any, error)
+	Message() (map[string]any, error)
 }
 
 func NewCardMessage(builder Receivers, card TemplateCard) *CardMessage {
@@ -16,8 +16,8 @@ func NewCardMessage(builder Receivers, card TemplateCard) *CardMessage {
 	}
 }
 
-func (m *CardMessage) ToJSON() (map[string]interface{}, error) {
-	templateCardMap, err := m.TemplateCard.ToMap()
+func (m *CardMessage) Message() (map[string]interface{}, error) {
+	templateCardMap, err := m.TemplateCard.Message()
 	if err != nil {
 		return nil, err
 	}

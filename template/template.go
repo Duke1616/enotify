@@ -1,6 +1,7 @@
 package template
 
 import (
+	"bytes"
 	"html/template"
 	"io"
 	"os"
@@ -49,7 +50,7 @@ func FromGlobs(paths []string, options ...Option) (*Template, error) {
 
 	defaultTemplates := []string{"default.tmpl", "email.tmpl"}
 	for _, file := range defaultTemplates {
-		f, er := os.Open(path.Join("config", file))
+		f, er := os.Open(path.Join("/Users/draken/Desktop/enotify/template/", file))
 		if er != nil {
 			return nil, er
 		}
@@ -67,6 +68,24 @@ func FromGlobs(paths []string, options ...Option) (*Template, error) {
 		}
 	}
 	return t, nil
+}
+
+func (t *Template) Execute(dynamic string, data interface{}) (string, error) {
+	if dynamic == "" {
+		return "", nil
+	}
+	tmpl, err := t.template.Clone()
+	if err != nil {
+		return "", err
+	}
+
+	tmpl, err = tmpl.New("").Option("missingkey=zero").Parse(dynamic)
+	if err != nil {
+		return "", err
+	}
+	var buf bytes.Buffer
+	err = tmpl.Execute(&buf, data)
+	return buf.String(), err
 }
 
 func (t *Template) FromGlob(path string) error {

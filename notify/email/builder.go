@@ -1,7 +1,14 @@
 package email
 
 import (
-	"enotify/template"
+	"github.com/Duke1616/enotify/template"
+)
+
+type ContextType string
+
+const (
+	TEXT ContextType = "text/plain"
+	HTML ContextType = "text/html"
 )
 
 type Builder interface {
@@ -9,6 +16,8 @@ type Builder interface {
 	SetToForm(form []string) Builder
 	SetToUser(to string) Builder
 	SetToSubject(subject string) Builder
+	SetToBody(dynamicTmpl string, body map[string]any) Builder
+	SetToContentType(ContextType ContextType) Builder
 }
 
 type Email struct {
@@ -19,7 +28,7 @@ type Email struct {
 	Body        string
 }
 
-func (m *Email) Message() (Email, error) {
+func (m Email) Message() (Email, error) {
 	j := Email{
 		From:        m.From,
 		To:          m.To,
@@ -44,11 +53,6 @@ func NewEmailBuilder(tmpl *template.Template) Builder {
 }
 
 func (b *emailBuilder) Build() Email {
-	//var buf bytes.Buffer
-	//if err := b.Template.Execute(&buf, b.Email); err != nil {
-	//	panic(err)
-	//}
-	//b.Email.Body = buf.String()
 	return b.Email
 }
 
@@ -64,5 +68,40 @@ func (b *emailBuilder) SetToUser(to string) Builder {
 
 func (b *emailBuilder) SetToSubject(subject string) Builder {
 	b.Email.Subject = subject
+	return b
+}
+
+func (b *emailBuilder) SetToBody(dynamicTmpl string, body map[string]any) Builder {
+	// 模板内容
+	dynamic := `
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{.Title}}</title>
+</head>
+<body>
+    <h1>{{.Heading}}</h1>
+    <p>{{.Content}}</p>
+</body>
+</html>
+`
+
+	// 模板数据
+	w := map[string]interface{}{
+		"Title":   "My Page",
+		"Heading": "Welcome to My Page",
+		"Content": "This is a sample content.",
+	}
+
+	data, err := b.Template.Execute(dynamic, w)
+	if err != nil {
+	}
+
+	b.Email.Body = data
+	return b
+}
+
+func (b *emailBuilder) SetToContentType(ContextType ContextType) Builder {
+	b.Email.ContentType = string(ContextType)
 	return b
 }

@@ -1,8 +1,8 @@
 package main
 
 import (
-	"enotify/template"
 	"fmt"
+	"github.com/Duke1616/enotify/template"
 )
 
 func main() {

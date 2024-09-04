@@ -10,6 +10,6 @@ func NewCustomMessage(custom map[string]any) *CustomMessage {
 	}
 }
 
-func (m *CustomMessage) ToJSON() (map[string]any, error) {
+func (m *CustomMessage) Message() (map[string]any, error) {
 	return m.Custom, nil
 }

@@ -2,7 +2,8 @@ package failover
 
 import (
 	"context"
-	"enotify/notify/sms"
+	"github.com/Duke1616/enotify/notify/sms"
+
 	"errors"
 
 	"log"
@@ -20,7 +21,7 @@ func NewFailOverSMSService(svcs []sms.Service) sms.Service {
 	}
 }
 
-func (f *SMSFailOverService) Send(ctx context.Context, tpl string, args []string, numbers ...string) error {
+func (f *SMSFailOverService) Send(ctx context.Context, tpl string, args []sms.Args, numbers ...string) error {
 	for _, svc := range f.svcs {
 		err := svc.Send(ctx, tpl, args, numbers...)
 		// 发送成功

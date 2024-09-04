@@ -4,10 +4,10 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"enotify/notify"
-	"enotify/pkg/httpx"
 	"errors"
 	"fmt"
+	"github.com/Duke1616/enotify/notify"
+	"github.com/Duke1616/enotify/pkg/httpx"
 	"github.com/gotomicro/ego/core/elog"
 	"io"
 	"net/http"
@@ -71,7 +71,7 @@ func WithAgentId(agentId string) Option {
 	}
 }
 
-func (n *Notifier) Send(ctx context.Context, message notify.NotificationMessage) (bool, error) {
+func (n *Notifier) Send(ctx context.Context, notify notify.BasicNotificationMessage[map[string]any]) (bool, error) {
 	// 每隔两个小时刷新 Token
 	err := n.renNewOrRefreshToken(ctx)
 	if err != nil {
@@ -79,7 +79,7 @@ func (n *Notifier) Send(ctx context.Context, message notify.NotificationMessage)
 	}
 
 	// 发送消息通知
-	err = n.send(ctx, message)
+	err = n.send(ctx, notify)
 	if err != nil {
 		return false, err
 	}
@@ -92,7 +92,7 @@ func (n *Notifier) CopyUrl() *url.URL {
 	return &v
 }
 
-func (n *Notifier) send(ctx context.Context, message notify.NotificationMessage) error {
+func (n *Notifier) send(ctx context.Context, message notify.BasicNotificationMessage[map[string]any]) error {
 	// 传递参数
 	parameters := url.Values{}
 	parameters.Add("access_token", n.accessToken)
@@ -104,7 +104,7 @@ func (n *Notifier) send(ctx context.Context, message notify.NotificationMessage)
 
 	// 发送数据
 	headers := make(map[string]string, 0)
-	j, err := message.ToJSON()
+	j, err := message.Message()
 	if err != nil {
 		return err
 	}

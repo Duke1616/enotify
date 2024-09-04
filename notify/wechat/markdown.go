@@ -13,7 +13,7 @@ func NewMarkdownMessage(builder Receivers, content string) *MarkdownMessage {
 	}
 }
 
-func (m *MarkdownMessage) ToJSON() (map[string]any, error) {
+func (m *MarkdownMessage) Message() (map[string]any, error) {
 	j := map[string]any{
 		"touser":  m.ToUser,
 		"toparty": m.ToParty,

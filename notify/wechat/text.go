@@ -13,7 +13,7 @@ func NewTextMessage(builder Receivers, content string) *TextMessage {
 	}
 }
 
-func (m *TextMessage) ToJSON() (map[string]any, error) {
+func (m *TextMessage) Message() (map[string]any, error) {
 	j := map[string]any{
 		"touser":  m.ToUser,
 		"toparty": m.ToParty,

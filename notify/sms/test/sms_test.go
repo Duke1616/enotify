@@ -1,11 +1,12 @@
-package sms
+package test
 
 import (
 	"context"
 	"github.com/Duke1616/enotify/notify"
+	"github.com/Duke1616/enotify/notify/sms"
 	"github.com/Duke1616/enotify/notify/sms/aliyun"
 	openapi "github.com/alibabacloud-go/darabonba-openapi/v2/client"
-	sms "github.com/alibabacloud-go/dysmsapi-20170525/v4/client"
+	dysmsapi "github.com/alibabacloud-go/dysmsapi-20170525/v4/client"
 	"github.com/alibabacloud-go/tea/tea"
 	"github.com/joho/godotenv"
 	"github.com/magiconair/properties/assert"
@@ -23,7 +24,7 @@ func TestSmsNotify(t *testing.T) {
 
 type SMSNotifyTestSuite struct {
 	suite.Suite
-	notify *Notifier
+	notify *sms.Notifier
 }
 
 func (s *SMSNotifyTestSuite) SetupSuite() {
@@ -43,13 +44,13 @@ func (s *SMSNotifyTestSuite) SetupSuite() {
 		AccessKeySecret: tea.String(secretKey),
 	}
 	config.Endpoint = tea.String("dysmsapi.aliyuncs.com")
-	c, err := sms.NewClient(config)
+	c, err := dysmsapi.NewClient(config)
 	if err != nil {
 		s.T().Fatal()
 	}
 
 	smsSvc := aliyun.NewService(c, "阿里云短信测试")
-	s.notify = NewSmsNotifier(smsSvc)
+	s.notify = sms.NewSmsNotifier(smsSvc)
 	require.NoError(s.T(), err)
 }
 
@@ -62,14 +63,14 @@ func (s *SMSNotifyTestSuite) TestEmailMessage() {
 
 	testCases := []struct {
 		name       string
-		req        notify.BasicNotificationMessage[Sms]
+		req        notify.BasicNotificationMessage[sms.Sms]
 		wantResult bool
 	}{
 		{
 			name: "阿里云短信",
-			req: NewSms("SMS_154950909", []Args{{
+			req: sms.NewSms("SMS_154950909", []sms.Args{{
 				Val:  "code",
-				Name: "hello",
+				Name: "123456",
 			}}, []string{number}...),
 			wantResult: true,
 		},

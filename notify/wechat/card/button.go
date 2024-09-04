@@ -117,7 +117,7 @@ func generateRandomString(length int) string {
 	return hex.EncodeToString(bytes)
 }
 
-func (b *buttonCard) ToMap() (map[string]any, error) {
+func (b *buttonCard) Message() (map[string]any, error) {
 	result := map[string]interface{}{
 		"card_type":               b.CardType,
 		"task_id":                 b.TaskId,

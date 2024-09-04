@@ -2,8 +2,8 @@ package wechat
 
 import (
 	"context"
-	"enotify/notify"
-	"enotify/notify/wechat/card"
+	"github.com/Duke1616/enotify/notify"
+	"github.com/Duke1616/enotify/notify/wechat/card"
 	"github.com/magiconair/properties/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
@@ -18,16 +18,21 @@ func TestWechatNotify(t *testing.T) {
 
 type WechatNotifyTestSuite struct {
 	suite.Suite
-	notify notify.Notifier
+	notify *Notifier
 }
 
 func (s *WechatNotifyTestSuite) SetupSuite() {
 	var err error
-	corpId := os.Getenv("WECHAT_CORP_ID")
-	corpSecret := os.Getenv("WECHAT_CORP_SECRET")
+	corpId, ok := os.LookupEnv("WECHAT_CORP_ID")
+	if !ok {
+		s.T().Fatal()
+	}
+	corpSecret, ok := os.LookupEnv("WECHAT_CORP_SECRET")
+	if !ok {
+		s.T().Fatal()
+	}
 
 	s.notify, err = NewWechatNotify(corpId, corpSecret)
-
 	require.NoError(s.T(), err)
 }
 
@@ -36,7 +41,7 @@ func (s *WechatNotifyTestSuite) TestWechatMessage() {
 
 	testCases := []struct {
 		name       string
-		req        notify.NotificationMessage
+		req        notify.BasicNotificationMessage[map[string]any]
 		wantResult bool
 	}{
 		{
