@@ -8,6 +8,7 @@ import (
 	"github.com/gotomicro/ego/core/elog"
 	"github.com/larksuite/oapi-sdk-go/v3"
 	"github.com/larksuite/oapi-sdk-go/v3/core"
+	larkim "github.com/larksuite/oapi-sdk-go/v3/service/im/v1"
 	"net/url"
 )
 
@@ -20,6 +21,7 @@ type Notifier struct {
 	larkC *lark.Client
 }
 
+// NewFeishuNotify SDK 使用文档：https://github.com/larksuite/oapi-sdk-go/tree/v3_main
 func NewFeishuNotify(appId, appSecret string, opts ...lark.ClientOptionFunc) (*Notifier, error) {
 	if appId == "" || appSecret == "" {
 		return nil, errors.New("appId and appSecret must not be empty")
@@ -33,13 +35,13 @@ func NewFeishuNotify(appId, appSecret string, opts ...lark.ClientOptionFunc) (*N
 	return n, nil
 }
 
-func (n *Notifier) Send(ctx context.Context, notify notify.BasicNotificationMessage[Feishu]) (bool, error) {
+func (n *Notifier) Send(ctx context.Context, notify notify.BasicNotificationMessage[*larkim.CreateMessageReq]) (bool, error) {
 	msg, err := notify.Message()
 	if err != nil {
 		return false, err
 	}
 
-	resp, err := n.larkC.Im.Message.Create(ctx, msg.CreateMessageReq)
+	resp, err := n.larkC.Im.Message.Create(ctx, msg)
 	if err != nil {
 		return false, err
 

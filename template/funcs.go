@@ -3,6 +3,7 @@ package template
 import (
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
+	"reflect"
 	"regexp"
 	"strings"
 	"time"
@@ -45,4 +46,8 @@ var DefaultFuncs = FuncMap{
 		return t.In(loc), nil
 	},
 	"since": time.Since,
+	"last": func(index int, slice interface{}) bool {
+		v := reflect.ValueOf(slice)
+		return index == v.Len()-1
+	},
 }

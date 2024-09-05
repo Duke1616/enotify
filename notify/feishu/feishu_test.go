@@ -3,6 +3,8 @@ package feishu
 import (
 	"context"
 	"github.com/Duke1616/enotify/notify"
+	"github.com/Duke1616/enotify/notify/feishu/card"
+	"github.com/Duke1616/enotify/template"
 	"github.com/joho/godotenv"
 	larkim "github.com/larksuite/oapi-sdk-go/v3/service/im/v1"
 	"github.com/magiconair/properties/assert"
@@ -38,24 +40,35 @@ func (s *FeishuNotifyTestSuite) SetupSuite() {
 	require.NoError(s.T(), err)
 }
 
-func (s *FeishuNotifyTestSuite) TestWechatMessage() {
+func (s *FeishuNotifyTestSuite) TestFeishuMessage() {
 	t := s.T()
+
+	tmpl, err := template.FromGlobs([]string{"/Users/draken/Desktop/enotify/template/approval.tmpl"})
+	require.NoError(s.T(), err)
+	data := card.NewApprovalCardBuilder().SetToTitle("德玛西亚").SetToFields([]card.Field{
+		{
+			IsShort: false,
+			Tag:     "plain_text",
+			Content: "字段1内容",
+		},
+	}).Build()
 
 	testCases := []struct {
 		name       string
-		req        notify.BasicNotificationMessage[Feishu]
+		req        notify.BasicNotificationMessage[*larkim.CreateMessageReq]
 		wantResult bool
 	}{
 		{
-			name: "成功发送消息-文本",
-			req: NewFeishuMessage(larkim.NewCreateMessageReqBuilder().
-				ReceiveIdType(`user_id`).
-				Body(larkim.NewCreateMessageReqBodyBuilder().
-					ReceiveId(`bcegag66`).
-					MsgType(`text`).
-					Content(`{"text":"test content"}`).
-					Build()).
-				Build()),
+			name:       "发送自定义-卡片消息",
+			req:        NewFeishuMessage("user_id", "bcegag66", NewFeishuCustomCard(tmpl, data)),
+			wantResult: true,
+		},
+		{
+			name: "发送生成模版-卡片消息",
+			req: NewFeishuMessage("user_id", "bcegag66", NewFeishuTemplateCard(
+				"AAqCtHtCQMglP", "1.0.1", map[string]string{
+					"title": "德玛西亚",
+				})),
 			wantResult: true,
 		},
 	}
