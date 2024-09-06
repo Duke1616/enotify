@@ -1,35 +1,47 @@
 package card
 
+import "github.com/ecodeclub/ekit/slice"
+
 type Builder interface {
 	Build() map[string]interface{}
 	SetToTitle(title string) Builder
 	SetToFields(Fields []Field) Builder
+	SetToCallbackValue(callbackValues []Value) Builder
 }
 
 type Field struct {
-	IsShort bool
-	Tag     string
-	Content string
+	IsShort bool   `json:"is_short"`
+	Tag     string `json:"tag"`
+	Content string `json:"content"`
 }
 
 type Approval struct {
-	Fields []Field
-	Title  string
+	Fields        []Field `json:"fields"`
+	CallbackValue []Value `json:"callback_value"`
+	Title         string  `json:"title"`
+}
+
+type Value struct {
+	Key   string `json:"key"`
+	Value string `json:"value"`
 }
 
 func (a *Approval) Build() map[string]interface{} {
-	fieldsMap := make([]map[string]interface{}, len(a.Fields))
-	for i, field := range a.Fields {
-		fieldsMap[i] = map[string]interface{}{
-			"IsShort": field.IsShort,
-			"Tag":     field.Tag,
-			"Content": field.Content,
-		}
-	}
-
 	return map[string]interface{}{
-		"Title":  a.Title,
-		"Fields": fieldsMap,
+		"Title": a.Title,
+		"CallbackValue": slice.Map(a.CallbackValue, func(idx int, src Value) map[string]interface{} {
+			return map[string]interface{}{
+				"Key":   src.Key,
+				"Value": src.Value,
+			}
+		}),
+		"Fields": slice.Map(a.Fields, func(idx int, src Field) map[string]interface{} {
+			return map[string]interface{}{
+				"IsShort": src.IsShort,
+				"Tag":     src.Tag,
+				"Content": src.Content,
+			}
+		}),
 	}
 }
 
@@ -43,6 +55,10 @@ func (a *Approval) SetToFields(Fields []Field) Builder {
 	return a
 }
 
+func (a *Approval) SetToCallbackValue(callbackValues []Value) Builder {
+	a.CallbackValue = callbackValues
+	return a
+}
 func NewApprovalCardBuilder() Builder {
 	return &Approval{}
 }

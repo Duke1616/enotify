@@ -1,5 +1,6 @@
 {{ define "app" }}
 {
+  "schema": "2.0",
   "config": {
     "wide_screen_mode": true
   },
@@ -9,52 +10,100 @@
       "content": "{{.Title}}"
     }
   },
-  "elements": [
-    {
-      "tag": "div",
-      "fields": [
-        {{- range $index, $field := .Fields}}
-        {
-          "is_short": {{.IsShort}},
-          "text": {
-            "tag": "{{.Tag}}",
-            "content": "{{.Content}}"
-          }
-        }{{if not (last $index $.Fields)}},{{end}}
-        {{- end}}
-      ]
-    },
-    {
-      "tag": "hr"
-    },
-    {
-      "tag": "action",
-      "layout": "bisected",
-      "actions": [
-        {
-          "tag": "button",
-          "text": {
-            "tag": "plain_text",
-            "content": "批准"
+  "body": {
+    "elements": [
+      {
+        "tag": "div",
+        "fields": [
+          {{- range $index, $field := .Fields}}
+          {
+            "is_short": {{.IsShort}},
+            "text": {
+              "tag": "{{.Tag}}",
+              "content": "{{.Content}}"
+            }
+          }{{if not (last $index $.Fields)}},{{end}}
+          {{- end}}
+        ]
+      },
+      {
+        "tag": "hr"
+      },
+      {
+        "tag": "form",
+        "name": "form_1",
+        "elements": [
+          {
+            "tag": "input",
+            "name": "input1",
+            "placeholder": {
+              "tag": "plain_text",
+              "content": "请输入审批备注，选填"
+            },
+            "max_length": 200,
+            "width": "fill"
           },
-          "type": "primary",
-          "value": {
-            "chosen": "approve"
+          {
+            "tag": "column_set",
+            "flex_mode": "bisect",
+            "background_style": "default",
+            "horizontal_spacing": "8px",
+            "horizontal_align": "right",
+            "columns": [
+              {
+                "tag": "column",
+                "width": "auto",
+                "vertical_align": "top",
+                "vertical_spacing": "8px",
+                "background_style": "default",
+                "elements": [
+                  {
+                    "tag": "button",
+                    "action_type": "form_submit",
+                    "name": "pass",
+                    "text": {
+                      "content": "批准",
+                      "tag": "lark_md"
+                    },
+                    "value": {
+                      {{- range $index, $callback := .CallbackValue}}
+                      "{{$callback.Key}}": "{{$callback.Value}}"{{if not (last $index $.CallbackValue)}},{{end}}
+                      {{- end}}
+                    },
+                    "type": "primary"
+                  }
+                ]
+              },
+              {
+                "tag": "column",
+                "width": "auto",
+                "vertical_align": "top",
+                "vertical_spacing": "8px",
+                "background_style": "default",
+                "elements": [
+                  {
+                    "tag": "button",
+                    "action_type": "form_submit",
+                    "name": "reject",
+                    "text": {
+                      "content": "拒绝",
+                      "tag": "lark_md"
+                    },
+                    "value": {
+                      {{- range $index, $callback := .CallbackValue}}
+                      "{{$callback.Key}}": "{{$callback.Value}}"{{if not (last $index $.CallbackValue)}},{{end}}
+                      {{- end}}
+                    },
+                    "type": "danger"
+                  }
+                ]
+              }
+            ],
+            "margin": "12px 0px 0px 0px"
           }
-        },
-        {
-          "tag": "button",
-          "text": {
-            "tag": "plain_text",
-            "content": "拒绝"
-          },
-          "type": "primary",
-          "value": {
-            "chosen": "decline"
-          }
-        }
-      ]
-    }
-  ]
+        ]
+      }
+    ]
+  }
 }
 {{ end }}

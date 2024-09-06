@@ -7,12 +7,13 @@ import (
 
 type cardCustom struct {
 	tmpl *template.Template
+	name string
 	data map[string]interface{}
 }
 
 func (c *cardCustom) Builder() string {
 	// 执行模板
-	execute, err := c.tmpl.Execute("app", c.data)
+	execute, err := c.tmpl.Execute(c.name, c.data)
 	if err != nil {
 		return ""
 	}
@@ -27,9 +28,10 @@ func (c *cardCustom) MsgType() string {
 	return "interactive"
 }
 
-func NewFeishuCustomCard(tmpl *template.Template, data map[string]interface{}) Content {
+func NewFeishuCustomCard(tmpl *template.Template, name string, data map[string]interface{}) Content {
 	return &cardCustom{
 		tmpl: tmpl,
+		name: name,
 		data: data,
 	}
 }

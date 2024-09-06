@@ -43,13 +43,22 @@ func (s *FeishuNotifyTestSuite) SetupSuite() {
 func (s *FeishuNotifyTestSuite) TestFeishuMessage() {
 	t := s.T()
 
-	tmpl, err := template.FromGlobs([]string{"/Users/draken/Desktop/enotify/template/approval.tmpl"})
+	tmpl, err := template.FromGlobs([]string{"approval.tmpl"})
 	require.NoError(s.T(), err)
 	data := card.NewApprovalCardBuilder().SetToTitle("德玛西亚").SetToFields([]card.Field{
 		{
 			IsShort: false,
 			Tag:     "plain_text",
 			Content: "字段1内容",
+		},
+	}).SetToCallbackValue([]card.Value{
+		{
+			Key:   "task_id",
+			Value: "10",
+		},
+		{
+			Key:   "user_id",
+			Value: "123",
 		},
 	}).Build()
 
@@ -59,8 +68,9 @@ func (s *FeishuNotifyTestSuite) TestFeishuMessage() {
 		wantResult bool
 	}{
 		{
-			name:       "发送自定义-卡片消息",
-			req:        NewFeishuMessage("user_id", "bcegag66", NewFeishuCustomCard(tmpl, data)),
+			name: "发送自定义-卡片消息",
+			req: NewFeishuMessage("user_id", "bcegag66",
+				NewFeishuCustomCard(tmpl, "app", data)),
 			wantResult: true,
 		},
 		{
