@@ -31,7 +31,7 @@ type Notifier struct {
 
 type Option func(*Notifier)
 
-func NewWechatNotify(corpId, corpSecret string, opts ...Option) (*Notifier, error) {
+func NewWechatNotify(corpId, corpSecret string, opts ...Option) (notify.Notifier[map[string]any], error) {
 	if corpId == "" || corpSecret == "" {
 		return nil, errors.New("corpId and corpSecret must not be empty")
 	}
@@ -44,9 +44,10 @@ func NewWechatNotify(corpId, corpSecret string, opts ...Option) (*Notifier, erro
 	}
 
 	for _, o := range opts {
-		o(n)
+		o(n) // 直接应用选项
 	}
 
+	// 如果没有 URL，设置默认值
 	if n.url == nil {
 		parsedURL, err := url.Parse(wechatApiURL)
 		if err != nil {
@@ -58,16 +59,17 @@ func NewWechatNotify(corpId, corpSecret string, opts ...Option) (*Notifier, erro
 	return n, nil
 }
 
-// WithUrl 一般不需要传入，但是如果内网环境需要使用代理的地址
+// WithUrl 选项函数，用于自定义 URL
 func WithUrl(wxUrl *url.URL) Option {
-	return func(notify *Notifier) {
-		notify.url = wxUrl
+	return func(n *Notifier) {
+		n.url = wxUrl
 	}
 }
 
-func WithAgentId(agentId string) Option {
-	return func(notify *Notifier) {
-		notify.agentId = agentId
+// WithAgentId 选项函数，用于自定义 AgentId
+func WithAgentId[T any](agentId string) Option {
+	return func(n *Notifier) {
+		n.agentId = agentId
 	}
 }
 

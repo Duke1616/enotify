@@ -19,7 +19,7 @@ type Notifier struct {
 }
 
 // NewEmailNotify 构造函数
-func NewEmailNotify(url, username, password string, port int) *Notifier {
+func NewEmailNotify(url, username, password string, port int) notify.Notifier[Email] {
 	return &Notifier{
 		logger:       elog.DefaultLogger,
 		smtpUrl:      url,

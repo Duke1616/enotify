@@ -13,7 +13,7 @@ type Notifier struct {
 	Service Service
 }
 
-func NewSmsNotifier(smsSvc Service) *Notifier {
+func NewSmsNotifier(smsSvc Service) notify.Notifier[Sms] {
 	return &Notifier{
 		Service: smsSvc,
 	}

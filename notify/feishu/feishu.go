@@ -22,7 +22,7 @@ type Notifier struct {
 }
 
 // NewFeishuNotify SDK 使用文档：https://github.com/larksuite/oapi-sdk-go/tree/v3_main
-func NewFeishuNotify(appId, appSecret string, opts ...lark.ClientOptionFunc) (*Notifier, error) {
+func NewFeishuNotify(appId, appSecret string, opts ...lark.ClientOptionFunc) (notify.Notifier[*larkim.CreateMessageReq], error) {
 	if appId == "" || appSecret == "" {
 		return nil, errors.New("appId and appSecret must not be empty")
 	}
@@ -32,10 +32,11 @@ func NewFeishuNotify(appId, appSecret string, opts ...lark.ClientOptionFunc) (*N
 		logger: elog.DefaultLogger,
 	}
 
+	// 返回接口类型
 	return n, nil
 }
 
-func NewFeishuNotifyClient(client *lark.Client) (*Notifier, error) {
+func NewFeishuNotifyByClient(client *lark.Client) (notify.Notifier[*larkim.CreateMessageReq], error) {
 	n := &Notifier{
 		larkC:  client,
 		logger: elog.DefaultLogger,

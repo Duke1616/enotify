@@ -24,7 +24,7 @@ func TestSmsNotify(t *testing.T) {
 
 type SMSNotifyTestSuite struct {
 	suite.Suite
-	notify *sms.Notifier
+	notify notify.Notifier[sms.Sms]
 }
 
 func (s *SMSNotifyTestSuite) SetupSuite() {

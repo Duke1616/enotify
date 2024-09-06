@@ -21,7 +21,7 @@ func TestEmailNotify(t *testing.T) {
 
 type EmailNotifyTestSuite struct {
 	suite.Suite
-	notify *Notifier
+	notify notify.Notifier[Email]
 }
 
 func (s *EmailNotifyTestSuite) SetupSuite() {

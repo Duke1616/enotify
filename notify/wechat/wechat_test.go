@@ -18,7 +18,7 @@ func TestWechatNotify(t *testing.T) {
 
 type WechatNotifyTestSuite struct {
 	suite.Suite
-	notify *Notifier
+	notify notify.Notifier[map[string]interface{}]
 }
 
 func (s *WechatNotifyTestSuite) SetupSuite() {

@@ -22,7 +22,7 @@ func TestFeishuNotify(t *testing.T) {
 
 type FeishuNotifyTestSuite struct {
 	suite.Suite
-	notify *Notifier
+	notify notify.Notifier[*larkim.CreateMessageReq]
 }
 
 func (s *FeishuNotifyTestSuite) SetupSuite() {
