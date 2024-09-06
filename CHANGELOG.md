@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+## [v0.1.2](https://github.com/Duke1616/enotify/releases/tag/v0.1.2) - 2024-09-06
+
+- [`01b5649`](https://github.com/Duke1616/enotify/commit/01b56490f66c426d08a229b86b0b355c6a3c7a3a) fix: 通过实现接口进行返回
+
 ## [v0.1.1](https://github.com/Duke1616/enotify/releases/tag/v0.1.1) - 2024-09-06
 
 - [`f14581b`](https://github.com/Duke1616/enotify/commit/f14581b10a413b578c5808fc0cda447325126df8) fix: 提供 new 飞书 client 方法
