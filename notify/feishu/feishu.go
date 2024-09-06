@@ -35,6 +35,15 @@ func NewFeishuNotify(appId, appSecret string, opts ...lark.ClientOptionFunc) (*N
 	return n, nil
 }
 
+func NewFeishuNotifyClient(client *lark.Client) (*Notifier, error) {
+	n := &Notifier{
+		larkC:  client,
+		logger: elog.DefaultLogger,
+	}
+
+	return n, nil
+}
+
 func (n *Notifier) Send(ctx context.Context, notify notify.BasicNotificationMessage[*larkim.CreateMessageReq]) (bool, error) {
 	msg, err := notify.Message()
 	if err != nil {
