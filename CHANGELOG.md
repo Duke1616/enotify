@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+## [v0.1.3](https://github.com/Duke1616/enotify/releases/tag/v0.1.3) - 2024-09-07
+
+- [`d84033a`](https://github.com/Duke1616/enotify/commit/d84033a1d741213c8e0f660fd424d90af11dec33) fix: 发版 tag
+- [`2e4818b`](https://github.com/Duke1616/enotify/commit/2e4818be25840dc5615a66c2373ab6ac7265da40) refactor: 提供Wrap方法，进行重构
+
 ## [v0.1.2](https://github.com/Duke1616/enotify/releases/tag/v0.1.2) - 2024-09-06
 
 - [`01b5649`](https://github.com/Duke1616/enotify/commit/01b56490f66c426d08a229b86b0b355c6a3c7a3a) fix: 通过实现接口进行返回
