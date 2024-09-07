@@ -1,10 +1,9 @@
-package test
+package aliyun
 
 import (
 	"context"
 	"github.com/Duke1616/enotify/notify"
 	"github.com/Duke1616/enotify/notify/sms"
-	"github.com/Duke1616/enotify/notify/sms/aliyun"
 	openapi "github.com/alibabacloud-go/darabonba-openapi/v2/client"
 	dysmsapi "github.com/alibabacloud-go/dysmsapi-20170525/v4/client"
 	"github.com/alibabacloud-go/tea/tea"
@@ -49,7 +48,7 @@ func (s *SMSNotifyTestSuite) SetupSuite() {
 		s.T().Fatal()
 	}
 
-	smsSvc := aliyun.NewService(c, "阿里云短信测试")
+	smsSvc := NewService(c, "阿里云短信测试")
 	s.notify = sms.NewSmsNotifier(smsSvc)
 	require.NoError(s.T(), err)
 }
@@ -63,15 +62,15 @@ func (s *SMSNotifyTestSuite) TestEmailMessage() {
 
 	testCases := []struct {
 		name       string
-		req        notify.BasicNotificationMessage[sms.Sms]
+		wrap       notify.NotifierWrap
 		wantResult bool
 	}{
 		{
 			name: "阿里云短信",
-			req: sms.NewSms("SMS_154950909", []sms.Args{{
+			wrap: notify.WrapNotifier(s.notify, sms.NewSms("SMS_154950909", []sms.Args{{
 				Val:  "code",
-				Name: "123456",
-			}}, []string{number}...),
+				Name: "377644",
+			}}, []string{number}...)),
 			wantResult: true,
 		},
 	}
@@ -81,7 +80,7 @@ func (s *SMSNotifyTestSuite) TestEmailMessage() {
 			ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
 			defer cancel()
 
-			ok, err := s.notify.Send(ctx, tc.req)
+			ok, err := tc.wrap.Send(ctx)
 			require.NoError(t, err)
 			assert.Equal(t, ok, tc.wantResult)
 		})

@@ -67,7 +67,7 @@ func WithUrl(wxUrl *url.URL) Option {
 }
 
 // WithAgentId 选项函数，用于自定义 AgentId
-func WithAgentId[T any](agentId string) Option {
+func WithAgentId(agentId string) Option {
 	return func(n *Notifier) {
 		n.agentId = agentId
 	}

@@ -12,11 +12,11 @@ const (
 )
 
 type Builder interface {
-	Build() Email
+	Build() (Email, error)
 	SetToForm(form []string) Builder
 	SetToUser(to string) Builder
 	SetToSubject(subject string) Builder
-	SetToBody(dynamicTmpl string, body map[string]any) Builder
+	SetToBody(name string, data interface{}) Builder
 	SetToContentType(ContextType ContextType) Builder
 }
 
@@ -26,6 +26,7 @@ type Email struct {
 	Subject     string
 	ContentType string
 	Body        string
+	Error       error
 }
 
 func (m Email) Message() (Email, error) {
@@ -42,7 +43,8 @@ func (m Email) Message() (Email, error) {
 
 type emailBuilder struct {
 	Template *template.Template
-	Email    Email
+
+	Email Email
 }
 
 func NewEmailBuilder(tmpl *template.Template) Builder {
@@ -52,8 +54,12 @@ func NewEmailBuilder(tmpl *template.Template) Builder {
 	}
 }
 
-func (b *emailBuilder) Build() Email {
-	return b.Email
+func (b *emailBuilder) Build() (Email, error) {
+	if b.Email.Error != nil {
+		return Email{}, b.Email.Error
+	}
+
+	return b.Email, nil
 }
 
 func (b *emailBuilder) SetToForm(form []string) Builder {
@@ -71,33 +77,13 @@ func (b *emailBuilder) SetToSubject(subject string) Builder {
 	return b
 }
 
-func (b *emailBuilder) SetToBody(dynamicTmpl string, body map[string]any) Builder {
-	// 模板内容
-	dynamic := `
-<!DOCTYPE html>
-<html>
-<head>
-    <title>{{.Title}}</title>
-</head>
-<body>
-    <h1>{{.Heading}}</h1>
-    <p>{{.Content}}</p>
-</body>
-</html>
-`
-
-	// 模板数据
-	w := map[string]interface{}{
-		"Title":   "My Page",
-		"Heading": "Welcome to My Page",
-		"Content": "This is a sample content.",
-	}
-
-	data, err := b.Template.Execute(dynamic, w)
+func (b *emailBuilder) SetToBody(name string, data interface{}) Builder {
+	body, err := b.Template.Execute(name, data)
 	if err != nil {
+		b.Email.Error = err
 	}
 
-	b.Email.Body = data
+	b.Email.Body = body
 	return b
 }
 

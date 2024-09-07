@@ -11,17 +11,17 @@ type cardCustom struct {
 	data map[string]interface{}
 }
 
-func (c *cardCustom) Builder() string {
+func (c *cardCustom) Builder() (string, error) {
 	// 执行模板
 	execute, err := c.tmpl.Execute(c.name, c.data)
 	if err != nil {
-		return ""
+		return "", err
 	}
 
 	// 打印生成的 JSON 字符串
 	fmt.Println(execute)
 
-	return execute
+	return execute, nil
 }
 
 func (c *cardCustom) MsgType() string {

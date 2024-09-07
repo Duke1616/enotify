@@ -5,7 +5,7 @@ import (
 )
 
 type Content interface {
-	Builder() string
+	Builder() (string, error)
 	MsgType() string
 }
 
@@ -14,9 +14,14 @@ type Feishu struct {
 	ReceiveId     string
 	MsgType       string
 	Content       string
+	Error         error
 }
 
 func (f *Feishu) Message() (*larkim.CreateMessageReq, error) {
+	if f.Error != nil {
+		return nil, f.Error
+	}
+
 	return larkim.NewCreateMessageReqBuilder().
 		ReceiveIdType(f.ReceiveIdType).
 		Body(larkim.NewCreateMessageReqBodyBuilder().
@@ -26,10 +31,17 @@ func (f *Feishu) Message() (*larkim.CreateMessageReq, error) {
 }
 
 func NewFeishuMessage(ReceiveIdType, ReceiveId string, c Content) *Feishu {
+	content, err := c.Builder()
+	if err != nil {
+		return &Feishu{
+			Error: err,
+		}
+	}
+
 	return &Feishu{
 		ReceiveIdType: ReceiveIdType,
 		ReceiveId:     ReceiveId,
 		MsgType:       c.MsgType(),
-		Content:       c.Builder(),
+		Content:       content,
 	}
 }

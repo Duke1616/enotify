@@ -8,7 +8,7 @@ type cardTemplate struct {
 	Variables  map[string]string
 }
 
-func (c *cardTemplate) Builder() string {
+func (c *cardTemplate) Builder() (string, error) {
 	data := map[string]interface{}{
 		"type": "template",
 		"data": map[string]interface{}{
@@ -18,8 +18,12 @@ func (c *cardTemplate) Builder() string {
 		},
 	}
 
-	vars, _ := json.Marshal(data)
-	return string(vars)
+	vars, err := json.Marshal(data)
+	if err != nil {
+		return "", err
+	}
+
+	return string(vars), nil
 }
 
 func (c *cardTemplate) MsgType() string {

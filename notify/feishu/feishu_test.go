@@ -22,6 +22,7 @@ func TestFeishuNotify(t *testing.T) {
 
 type FeishuNotifyTestSuite struct {
 	suite.Suite
+	tmpl   *template.Template
 	notify notify.Notifier[*larkim.CreateMessageReq]
 }
 
@@ -38,47 +39,46 @@ func (s *FeishuNotifyTestSuite) SetupSuite() {
 
 	s.notify, err = NewFeishuNotify(appId, appSecret)
 	require.NoError(s.T(), err)
+
+	s.tmpl, err = template.FromGlobs([]string{})
+	require.NoError(s.T(), err)
 }
 
 func (s *FeishuNotifyTestSuite) TestFeishuMessage() {
 	t := s.T()
 
-	tmpl, err := template.FromGlobs([]string{"approval.tmpl"})
-	require.NoError(s.T(), err)
-	data := card.NewApprovalCardBuilder().SetToTitle("德玛西亚").SetToFields([]card.Field{
-		{
-			IsShort: false,
-			Tag:     "plain_text",
-			Content: "字段1内容",
-		},
-	}).SetToCallbackValue([]card.Value{
-		{
-			Key:   "task_id",
-			Value: "10",
-		},
-		{
-			Key:   "user_id",
-			Value: "123",
-		},
-	}).Build()
-
 	testCases := []struct {
 		name       string
-		req        notify.BasicNotificationMessage[*larkim.CreateMessageReq]
+		wrap       notify.NotifierWrap
 		wantResult bool
 	}{
 		{
 			name: "发送自定义-卡片消息",
-			req: NewFeishuMessage("user_id", "bcegag66",
-				NewFeishuCustomCard(tmpl, "app", data)),
+			wrap: notify.WrapNotifier(s.notify, NewFeishuMessage("user_id", "bcegag66",
+				NewFeishuCustomCard(s.tmpl, "feishu-card-callback", card.NewApprovalCardBuilder().SetToTitle("德玛西亚").SetToFields([]card.Field{
+					{
+						IsShort: false,
+						Tag:     "plain_text",
+						Content: "字段1内容",
+					},
+				}).SetToCallbackValue([]card.Value{
+					{
+						Key:   "task_id",
+						Value: "10",
+					},
+					{
+						Key:   "user_id",
+						Value: "123",
+					},
+				}).Build()))),
 			wantResult: true,
 		},
 		{
 			name: "发送生成模版-卡片消息",
-			req: NewFeishuMessage("user_id", "bcegag66", NewFeishuTemplateCard(
+			wrap: notify.WrapNotifier(s.notify, NewFeishuMessage("user_id", "bcegag66", NewFeishuTemplateCard(
 				"AAqCtHtCQMglP", "1.0.1", map[string]string{
 					"title": "德玛西亚",
-				})),
+				}))),
 			wantResult: true,
 		},
 	}
@@ -88,7 +88,7 @@ func (s *FeishuNotifyTestSuite) TestFeishuMessage() {
 			ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
 			defer cancel()
 
-			ok, err := s.notify.Send(ctx, tc.req)
+			ok, err := tc.wrap.Send(ctx)
 			require.NoError(t, err)
 			assert.Equal(t, ok, tc.wantResult)
 		})

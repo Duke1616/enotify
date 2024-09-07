@@ -52,28 +52,36 @@ func (s *EmailNotifyTestSuite) TestEmailMessage() {
 		s.T().Fatal()
 	}
 
-	globs, err := template.FromGlobs([]string{})
+	globs, err := template.FromGlobs([]string{"email.tmpl"})
 	if err != nil {
 		fmt.Print(err)
 		return
 	}
 
-	data := make(map[string]any, 0)
-	data["name"] = "张三"
+	data := map[string]interface{}{
+		"Title":   "My Page",
+		"Heading": "Welcome to My Page",
+		"Content": "This is a sample content.",
+	}
 
 	testCases := []struct {
 		name       string
-		req        notify.BasicNotificationMessage[Email]
+		warp       notify.NotifierWrap
 		wantResult bool
 	}{
 		{
 			name: "成功发送消息-文本",
-			req: NewEmailBuilder(globs).SetToUser(form).
-				SetToForm([]string{to}).
-				SetToSubject("title").
-				SetToContentType(HTML).
-				SetToBody("", data).
-				Build(),
+			warp: func() notify.NotifierWrap {
+				b, er := NewEmailBuilder(globs).SetToUser(form).
+					SetToForm([]string{to}).
+					SetToSubject("title").
+					SetToContentType(HTML).
+					SetToBody("notify-email", data).
+					Build()
+
+				require.NoError(t, er)
+				return notify.WrapNotifier(s.notify, b)
+			}(),
 			wantResult: true,
 		},
 	}
@@ -83,7 +91,7 @@ func (s *EmailNotifyTestSuite) TestEmailMessage() {
 			ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
 			defer cancel()
 
-			ok, err := s.notify.Send(ctx, tc.req)
+			ok, err = tc.warp.Send(ctx)
 			require.NoError(t, err)
 			assert.Equal(t, ok, tc.wantResult)
 		})

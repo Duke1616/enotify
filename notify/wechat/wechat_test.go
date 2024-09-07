@@ -4,9 +4,11 @@ import (
 	"context"
 	"github.com/Duke1616/enotify/notify"
 	"github.com/Duke1616/enotify/notify/wechat/card"
+	"github.com/joho/godotenv"
 	"github.com/magiconair/properties/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
+	"log"
 	"os"
 	"testing"
 	"time"
@@ -41,24 +43,24 @@ func (s *WechatNotifyTestSuite) TestWechatMessage() {
 
 	testCases := []struct {
 		name       string
-		req        notify.BasicNotificationMessage[map[string]any]
+		wrap       notify.NotifierWrap
 		wantResult bool
 	}{
 		{
 			name: "成功发送消息-文本",
-			req: NewTextMessage(NewReceiversBuilder().SetAgentId(1000004).SetToUser(
-				[]string{"LuanKaiZhao"}).Build(), "hello world!"),
+			wrap: notify.WrapNotifier(s.notify, NewTextMessage(NewReceiversBuilder().SetAgentId(1000004).SetToUser(
+				[]string{"LuanKaiZhao"}).Build(), "hello world!")),
 			wantResult: true,
 		},
 		{
 			name: "成功发送消息-markdown",
-			req: NewMarkdownMessage(NewReceiversBuilder().SetAgentId(1000004).SetToUser(
-				[]string{"LuanKaiZhao"}).Build(), "## 这是一个Markdown消息\n\n**加粗** 和 *斜体*"),
+			wrap: notify.WrapNotifier(s.notify, NewMarkdownMessage(NewReceiversBuilder().SetAgentId(1000004).SetToUser(
+				[]string{"LuanKaiZhao"}).Build(), "## 这是一个Markdown消息\n\n**加粗** 和 *斜体*")),
 			wantResult: true,
 		},
 		{
 			name: "成功发送消息-card",
-			req: NewCardMessage(NewReceiversBuilder().SetAgentId(1000004).SetToUser(
+			wrap: notify.WrapNotifier(s.notify, NewCardMessage(NewReceiversBuilder().SetAgentId(1000004).SetToUser(
 				[]string{"LuanKaiZhao"}).Build(), card.NewButtonCardBuilder().SetToMailTitle(
 				card.NewMailTitle("Example Title", "Example Description")).
 				SetSelection(card.ButtonSelection{
@@ -78,7 +80,7 @@ func (s *WechatNotifyTestSuite) TestWechatMessage() {
 					{KeyName: "Key1", Value: "Value1"},
 					{KeyName: "Key2", Value: "Value2"},
 				}).
-				Build()),
+				Build())),
 			wantResult: true,
 		},
 	}
@@ -88,9 +90,16 @@ func (s *WechatNotifyTestSuite) TestWechatMessage() {
 			ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
 			defer cancel()
 
-			ok, err := s.notify.Send(ctx, tc.req)
+			ok, err := tc.wrap.Send(ctx)
 			require.NoError(t, err)
 			assert.Equal(t, ok, tc.wantResult)
 		})
+	}
+}
+
+func init() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
 	}
 }

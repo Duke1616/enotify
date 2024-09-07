@@ -59,6 +59,7 @@ func (a *Approval) SetToCallbackValue(callbackValues []Value) Builder {
 	a.CallbackValue = callbackValues
 	return a
 }
+
 func NewApprovalCardBuilder() Builder {
 	return &Approval{}
 }

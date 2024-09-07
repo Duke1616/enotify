@@ -1,46 +1,53 @@
 package template
 
 import (
-	"bytes"
-	"fmt"
+	"github.com/magiconair/properties/assert"
+	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/suite"
 	"testing"
-	"text/template"
 )
 
-type Field struct {
-	IsShort bool
-	Tag     string
-	Content string
-}
-
-type FieldList struct {
-	Fields []Field
-}
-
 func TestTemplate(t *testing.T) {
-	tmpl, err := template.ParseFiles("./approval.tmpl")
-	if err != nil {
+	suite.Run(t, new(TemplateTestSuite))
+}
 
-	}
+type TemplateTestSuite struct {
+	suite.Suite
+}
 
-	// 创建一个包含多个休假申请的列表
-	requestList := FieldList{
-		Fields: []Field{
-			{
-				IsShort: false,
-				Tag:     "lark_md",
-				Content: "**时间：**\n2020-4-8 至 2020-4-10（共3天）",
+func (s *TemplateTestSuite) SetupSuite() {
+}
+
+func (s *TemplateTestSuite) TestTemplateExecute() {
+	t := s.T()
+
+	testCases := []struct {
+		name       string
+		tmpl       *Template
+		req        interface{}
+		wantResult string
+	}{
+		{
+			name: "成功发送消息-文本",
+			tmpl: func() *Template {
+				tmpl, err := FromGlobs([]string{"test/test.tmpl"})
+				require.NoError(t, err)
+				return tmpl
+			}(),
+			req: map[string]interface{}{
+				"Title": "hello，world",
 			},
+			wantResult: `
+notify: "hello，world"
+`,
 		},
 	}
 
-	var Title string = "您好"
-
-	// 执行模板
-	var out bytes.Buffer
-	err = tmpl.Execute(&out, requestList)
-
-	err = tmpl.Execute(&out, Title)
-
-	fmt.Print(out)
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			result, err := tc.tmpl.Execute("template-test", tc.req)
+			require.NoError(t, err)
+			assert.Equal(t, result, tc.wantResult)
+		})
+	}
 }

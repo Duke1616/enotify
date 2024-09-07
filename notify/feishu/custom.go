@@ -5,8 +5,8 @@ type custom struct {
 	Content string
 }
 
-func (c *custom) Builder() string {
-	return c.Content
+func (c *custom) Builder() (string, error) {
+	return c.Content, nil
 }
 
 func (c *custom) MsgType() string {

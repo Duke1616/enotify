@@ -2,12 +2,15 @@ package template
 
 import (
 	"bytes"
+	"embed"
 	"html/template"
 	"io"
-	"os"
-	"path"
+	"io/fs"
 	"path/filepath"
 )
+
+//go:embed default/*.tmpl
+var templates embed.FS
 
 type Template struct {
 	template *template.Template
@@ -17,7 +20,7 @@ type Option func(tmpl *template.Template)
 
 func newTemplate(options ...Option) (*Template, error) {
 	t := &Template{
-		template: template.New("").Option("missingkey=zero"),
+		template: template.New("enotify").Option("missingkey=zero"),
 	}
 
 	for _, o := range options {
@@ -48,53 +51,37 @@ func FromGlobs(paths []string, options ...Option) (*Template, error) {
 		return nil, err
 	}
 
-	defaultTemplates := []string{"default.tmpl", "email.tmpl"}
-	for _, file := range defaultTemplates {
-		f, er := os.Open(path.Join("/Users/draken/Desktop/enotify/template/", file))
-		if er != nil {
-			return nil, er
+	err = fs.WalkDir(templates, "default", func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
 		}
 
-		if er = t.Parse(f); er != nil {
+		// 排除目录本身
+		if d.IsDir() {
+			return nil
+		}
+
+		// 加载所有默认模版文件
+		f, err := templates.Open(path)
+		if err = t.Parse(f); err != nil {
 			f.Close()
-			return nil, er
+			return err
 		}
+
 		f.Close()
-	}
+		return nil
+	})
 
-	for _, tp := range paths {
-		if er := t.FromGlob(tp); er != nil {
-			return nil, er
-		}
-	}
-	return t, nil
-}
-
-func FromGlobsV1(paths []string, options ...Option) (*Template, error) {
-	t, err := newTemplate(options...)
 	if err != nil {
 		return nil, err
 	}
 
-	defaultTemplates := []string{"default.tmpl", "email.tmpl"}
-	for _, file := range defaultTemplates {
-		f, er := os.Open(path.Join("/Users/draken/Desktop/enotify/template/", file))
-		if er != nil {
-			return nil, er
-		}
-
-		if er = t.Parse(f); er != nil {
-			f.Close()
-			return nil, er
-		}
-		f.Close()
-	}
-
 	for _, tp := range paths {
-		if er := t.FromGlob(tp); er != nil {
-			return nil, er
+		if err = t.FromGlob(tp); err != nil {
+			return nil, err
 		}
 	}
+
 	return t, nil
 }
 
@@ -106,24 +93,7 @@ func (t *Template) Execute(name string, data interface{}) (string, error) {
 
 	var buf bytes.Buffer
 	err = tmpl.ExecuteTemplate(&buf, name, data)
-	return buf.String(), err
-}
 
-func (t *Template) ExecuteV1(dynamic string, data interface{}) (string, error) {
-	if dynamic == "" {
-		return "", nil
-	}
-	tmpl, err := t.template.Clone()
-	if err != nil {
-		return "", err
-	}
-
-	tmpl, err = tmpl.New("").Option("missingkey=zero").Parse(dynamic)
-	if err != nil {
-		return "", err
-	}
-	var buf bytes.Buffer
-	err = tmpl.Execute(&buf, data)
 	return buf.String(), err
 }
 
