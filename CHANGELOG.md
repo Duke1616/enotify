@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+## [v0.1.4](https://github.com/Duke1616/enotify/releases/tag/v0.1.4) - 2024-09-08
+
+- [`0686a11`](https://github.com/Duke1616/enotify/commit/0686a11046072ee3e8061b20555afdf7af10a0b8) fix: 修改Value类型为 any
+
 ## [v0.1.3](https://github.com/Duke1616/enotify/releases/tag/v0.1.3) - 2024-09-07
 
 - [`d84033a`](https://github.com/Duke1616/enotify/commit/d84033a1d741213c8e0f660fd424d90af11dec33) fix: 发版 tag
