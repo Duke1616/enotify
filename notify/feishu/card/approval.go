@@ -22,8 +22,8 @@ type Approval struct {
 }
 
 type Value struct {
-	Key   string `json:"key"`
-	Value string `json:"value"`
+	Key   string      `json:"key"`
+	Value interface{} `json:"value"`
 }
 
 func (a *Approval) Build() map[string]interface{} {
