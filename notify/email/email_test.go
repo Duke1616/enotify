@@ -80,7 +80,7 @@ func (s *EmailNotifyTestSuite) TestEmailMessage() {
 					Build()
 
 				require.NoError(t, er)
-				return notify.WrapNotifier(s.notify, b)
+				return notify.WrapNotifierStatic(s.notify, b)
 			}(),
 			wantResult: true,
 		},

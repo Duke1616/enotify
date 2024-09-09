@@ -67,7 +67,7 @@ func (s *SMSNotifyTestSuite) TestEmailMessage() {
 	}{
 		{
 			name: "阿里云短信",
-			wrap: notify.WrapNotifier(s.notify, sms.NewSms("SMS_154950909", []sms.Args{{
+			wrap: notify.WrapNotifierStatic(s.notify, sms.NewSms("SMS_154950909", []sms.Args{{
 				Val:  "code",
 				Name: "377644",
 			}}, []string{number}...)),

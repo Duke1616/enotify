@@ -48,19 +48,19 @@ func (s *WechatNotifyTestSuite) TestWechatMessage() {
 	}{
 		{
 			name: "成功发送消息-文本",
-			wrap: notify.WrapNotifier(s.notify, NewTextMessage(NewReceiversBuilder().SetAgentId(1000004).SetToUser(
+			wrap: notify.WrapNotifierStatic(s.notify, NewTextMessage(NewReceiversBuilder().SetAgentId(1000004).SetToUser(
 				[]string{"LuanKaiZhao"}).Build(), "hello world!")),
 			wantResult: true,
 		},
 		{
 			name: "成功发送消息-markdown",
-			wrap: notify.WrapNotifier(s.notify, NewMarkdownMessage(NewReceiversBuilder().SetAgentId(1000004).SetToUser(
+			wrap: notify.WrapNotifierStatic(s.notify, NewMarkdownMessage(NewReceiversBuilder().SetAgentId(1000004).SetToUser(
 				[]string{"LuanKaiZhao"}).Build(), "## 这是一个Markdown消息\n\n**加粗** 和 *斜体*")),
 			wantResult: true,
 		},
 		{
 			name: "成功发送消息-card",
-			wrap: notify.WrapNotifier(s.notify, NewCardMessage(NewReceiversBuilder().SetAgentId(1000004).SetToUser(
+			wrap: notify.WrapNotifierStatic(s.notify, NewCardMessage(NewReceiversBuilder().SetAgentId(1000004).SetToUser(
 				[]string{"LuanKaiZhao"}).Build(), card.NewButtonCardBuilder().SetToMailTitle(
 				card.NewMailTitle("Example Title", "Example Description")).
 				SetSelection(card.ButtonSelection{

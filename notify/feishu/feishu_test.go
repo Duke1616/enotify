@@ -54,7 +54,7 @@ func (s *FeishuNotifyTestSuite) TestFeishuMessage() {
 	}{
 		{
 			name: "发送自定义-卡片消息",
-			wrap: notify.WrapNotifier(s.notify, NewFeishuMessage("user_id", "bcegag66",
+			wrap: notify.WrapNotifierStatic(s.notify, NewFeishuMessage("user_id", "bcegag66",
 				NewFeishuCustomCard(s.tmpl, "feishu-card-callback", card.NewApprovalCardBuilder().SetToTitle("德玛西亚").SetToFields([]card.Field{
 					{
 						IsShort: false,
@@ -74,11 +74,21 @@ func (s *FeishuNotifyTestSuite) TestFeishuMessage() {
 			wantResult: true,
 		},
 		{
-			name: "发送生成模版-卡片消息",
-			wrap: notify.WrapNotifier(s.notify, NewFeishuMessage("user_id", "bcegag66", NewFeishuTemplateCard(
+			name: "发送生成模版-静态卡片消息",
+			wrap: notify.WrapNotifierStatic(s.notify, NewFeishuMessage("user_id", "bcegag66", NewFeishuTemplateCard(
 				"AAqCtHtCQMglP", "1.0.1", map[string]string{
 					"title": "德玛西亚",
 				}))),
+			wantResult: true,
+		},
+		{
+			name: "发送生成模版-动态卡片消息",
+			wrap: notify.WrapNotifierDynamic(s.notify, func() (notify.BasicNotificationMessage[*larkim.CreateMessageReq], error) {
+				return NewFeishuMessage("user_id", "bcegag66", NewFeishuTemplateCard(
+					"AAqCtHtCQMglP", "1.0.1", map[string]string{
+						"title": "艾欧尼亚",
+					})), nil
+			}),
 			wantResult: true,
 		},
 	}
