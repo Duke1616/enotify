@@ -70,7 +70,7 @@ func (s *FeishuNotifyTestSuite) TestFeishuMessage() {
 						Key:   "user_id",
 						Value: "123",
 					},
-				}).Build()))),
+				}).SetToHideForm(false).Build()))),
 			wantResult: true,
 		},
 		{

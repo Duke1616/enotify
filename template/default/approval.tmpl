@@ -27,7 +27,8 @@
           }{{if not (last $index $.Fields)}},{{end}}
           {{- end}}
         ]
-      },
+      }
+      {{- if not .HideForm }},
       {
         "tag": "hr"
       },
@@ -105,6 +106,7 @@
           }
         ]
       }
+      {{- end }}
     ]
   }
 }

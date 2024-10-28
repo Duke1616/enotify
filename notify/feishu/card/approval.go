@@ -6,6 +6,7 @@ type Builder interface {
 	Build() map[string]interface{}
 	SetToTitle(title string) Builder
 	SetToFields(Fields []Field) Builder
+	SetToHideForm(hideForm bool) Builder
 	SetToCallbackValue(callbackValues []Value) Builder
 }
 
@@ -18,6 +19,7 @@ type Field struct {
 type Approval struct {
 	Fields        []Field `json:"fields"`
 	CallbackValue []Value `json:"callback_value"`
+	HideForm      bool    `json:"hide_form"`
 	Title         string  `json:"title"`
 }
 
@@ -28,7 +30,8 @@ type Value struct {
 
 func (a *Approval) Build() map[string]interface{} {
 	return map[string]interface{}{
-		"Title": a.Title,
+		"Title":    a.Title,
+		"HideForm": a.HideForm,
 		"CallbackValue": slice.Map(a.CallbackValue, func(idx int, src Value) map[string]interface{} {
 			return map[string]interface{}{
 				"Key":   src.Key,
@@ -43,6 +46,11 @@ func (a *Approval) Build() map[string]interface{} {
 			}
 		}),
 	}
+}
+
+func (a *Approval) SetToHideForm(hideForm bool) Builder {
+	a.HideForm = hideForm
+	return a
 }
 
 func (a *Approval) SetToTitle(title string) Builder {
