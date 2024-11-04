@@ -54,7 +54,7 @@ func NewCreateFeishuNotifyByClient(client *lark.Client) (notify.Notifier[*larkim
 }
 
 func NewUpdateFeishuNotifyByClient(client *lark.Client) (notify.Notifier[*larkim.UpdateMessageReq], error) {
-	n := &CreateNotify{
+	n := &UpdateNotify{
 		larkC:  client,
 		logger: elog.DefaultLogger,
 	}
