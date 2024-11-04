@@ -1,15 +1,10 @@
-package feishu
+package message
 
 import (
 	larkim "github.com/larksuite/oapi-sdk-go/v3/service/im/v1"
 )
 
-type Content interface {
-	Builder() (string, error)
-	MsgType() string
-}
-
-type Feishu struct {
+type CreateFeishuMessage struct {
 	ReceiveIdType string
 	ReceiveId     string
 	MsgType       string
@@ -17,7 +12,7 @@ type Feishu struct {
 	Error         error
 }
 
-func (f *Feishu) Message() (*larkim.CreateMessageReq, error) {
+func (f *CreateFeishuMessage) Message() (*larkim.CreateMessageReq, error) {
 	if f.Error != nil {
 		return nil, f.Error
 	}
@@ -30,15 +25,15 @@ func (f *Feishu) Message() (*larkim.CreateMessageReq, error) {
 			Content(f.Content).Build()).Build(), nil
 }
 
-func NewFeishuMessage(ReceiveIdType, ReceiveId string, c Content) *Feishu {
+func NewCreateFeishuMessage(ReceiveIdType, ReceiveId string, c Content) *CreateFeishuMessage {
 	content, err := c.Builder()
 	if err != nil {
-		return &Feishu{
+		return &CreateFeishuMessage{
 			Error: err,
 		}
 	}
 
-	return &Feishu{
+	return &CreateFeishuMessage{
 		ReceiveIdType: ReceiveIdType,
 		ReceiveId:     ReceiveId,
 		MsgType:       c.MsgType(),

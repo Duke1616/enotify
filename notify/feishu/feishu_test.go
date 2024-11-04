@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/Duke1616/enotify/notify"
 	"github.com/Duke1616/enotify/notify/feishu/card"
+	"github.com/Duke1616/enotify/notify/feishu/message"
 	"github.com/Duke1616/enotify/template"
 	"github.com/joho/godotenv"
 	larkim "github.com/larksuite/oapi-sdk-go/v3/service/im/v1"
@@ -22,8 +23,9 @@ func TestFeishuNotify(t *testing.T) {
 
 type FeishuNotifyTestSuite struct {
 	suite.Suite
-	tmpl   *template.Template
-	notify notify.Notifier[*larkim.CreateMessageReq]
+	tmpl         *template.Template
+	createNotify notify.Notifier[*larkim.CreateMessageReq]
+	updateNotify notify.Notifier[*larkim.UpdateMessageReq]
 }
 
 func (s *FeishuNotifyTestSuite) SetupSuite() {
@@ -37,14 +39,17 @@ func (s *FeishuNotifyTestSuite) SetupSuite() {
 		s.T().Fatal()
 	}
 
-	s.notify, err = NewFeishuNotify(appId, appSecret)
+	s.createNotify, err = NewCreateFeishuNotify(appId, appSecret)
+	require.NoError(s.T(), err)
+
+	s.updateNotify, err = NewUpdateFeishuNotify(appId, appSecret)
 	require.NoError(s.T(), err)
 
 	s.tmpl, err = template.FromGlobs([]string{})
 	require.NoError(s.T(), err)
 }
 
-func (s *FeishuNotifyTestSuite) TestFeishuMessage() {
+func (s *FeishuNotifyTestSuite) TestCreateFeishuMessage() {
 	t := s.T()
 
 	testCases := []struct {
@@ -54,7 +59,7 @@ func (s *FeishuNotifyTestSuite) TestFeishuMessage() {
 	}{
 		{
 			name: "发送自定义-卡片消息",
-			wrap: notify.WrapNotifierStatic(s.notify, NewFeishuMessage("user_id", "bcegag66",
+			wrap: notify.WrapNotifierStatic(s.createNotify, message.NewCreateFeishuMessage("user_id", "bcegag66",
 				NewFeishuCustomCard(s.tmpl, "feishu-card-callback", card.NewApprovalCardBuilder().SetToTitle("德玛西亚").SetToFields([]card.Field{
 					{
 						IsShort: false,
@@ -74,20 +79,8 @@ func (s *FeishuNotifyTestSuite) TestFeishuMessage() {
 			wantResult: true,
 		},
 		{
-			name: "工单审批同意-卡片消息",
-			wrap: notify.WrapNotifierStatic(s.notify, NewFeishuMessage("user_id", "bcegag66",
-				NewFeishuCustomCard(s.tmpl, "feishu-card-want", card.NewApprovalCardBuilder().SetToTitle("德玛西亚").SetToFields([]card.Field{
-					{
-						IsShort: false,
-						Tag:     "plain_text",
-						Content: "字段1内容",
-					},
-				}).SetWantResult("你已同意该休假申请，并批注：好的，玩得开心").Build()))),
-			wantResult: true,
-		},
-		{
 			name: "发送生成模版-静态卡片消息",
-			wrap: notify.WrapNotifierStatic(s.notify, NewFeishuMessage("user_id", "bcegag66", NewFeishuTemplateCard(
+			wrap: notify.WrapNotifierStatic(s.createNotify, message.NewCreateFeishuMessage("user_id", "bcegag66", NewFeishuTemplateCard(
 				"AAqCtHtCQMglP", "1.0.1", map[string]string{
 					"title": "德玛西亚",
 				}))),
@@ -95,12 +88,46 @@ func (s *FeishuNotifyTestSuite) TestFeishuMessage() {
 		},
 		{
 			name: "发送生成模版-动态卡片消息",
-			wrap: notify.WrapNotifierDynamic(s.notify, func() (notify.BasicNotificationMessage[*larkim.CreateMessageReq], error) {
-				return NewFeishuMessage("user_id", "bcegag66", NewFeishuTemplateCard(
+			wrap: notify.WrapNotifierDynamic(s.createNotify, func() (notify.BasicNotificationMessage[*larkim.CreateMessageReq], error) {
+				return message.NewCreateFeishuMessage("user_id", "bcegag66", NewFeishuTemplateCard(
 					"AAqCtHtCQMglP", "1.0.1", map[string]string{
 						"title": "艾欧尼亚",
 					})), nil
 			}),
+			wantResult: true,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
+			defer cancel()
+
+			ok, err := tc.wrap.Send(ctx)
+			require.NoError(t, err)
+			assert.Equal(t, ok, tc.wantResult)
+		})
+	}
+}
+
+func (s *FeishuNotifyTestSuite) TestUpdateFeishuMessage() {
+	t := s.T()
+
+	testCases := []struct {
+		name       string
+		wrap       notify.NotifierWrap
+		wantResult bool
+	}{
+		{
+			name: "工单审批修改-卡片消息",
+			wrap: notify.WrapNotifierStatic(s.updateNotify, message.NewUpdateFeishuMessage("om_b434eb31ac949dec8ffdfc2b1cae787a ",
+				NewFeishuCustomCard(s.tmpl, "feishu-card-want", card.NewApprovalCardBuilder().SetToTitle("德玛西亚").SetToFields([]card.Field{
+					{
+						IsShort: false,
+						Tag:     "plain_text",
+						Content: "字段1内容",
+					},
+				}).SetWantResult("你已同意该休假申请，并批注：好的，玩得开心").Build()))),
 			wantResult: true,
 		},
 	}

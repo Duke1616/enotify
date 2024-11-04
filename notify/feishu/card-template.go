@@ -1,6 +1,9 @@
 package feishu
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"github.com/Duke1616/enotify/notify/feishu/message"
+)
 
 type cardTemplate struct {
 	version    string
@@ -30,7 +33,7 @@ func (c *cardTemplate) MsgType() string {
 	return "interactive"
 }
 
-func NewFeishuTemplateCard(templateId string, version string, variable map[string]string) Content {
+func NewFeishuTemplateCard(templateId string, version string, variable map[string]string) message.Content {
 	return &cardTemplate{
 		templateId: templateId,
 		version:    version,

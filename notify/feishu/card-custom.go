@@ -2,6 +2,7 @@ package feishu
 
 import (
 	"fmt"
+	"github.com/Duke1616/enotify/notify/feishu/message"
 	"github.com/Duke1616/enotify/template"
 )
 
@@ -28,7 +29,7 @@ func (c *cardCustom) MsgType() string {
 	return "interactive"
 }
 
-func NewFeishuCustomCard(tmpl *template.Template, name string, data map[string]interface{}) Content {
+func NewFeishuCustomCard(tmpl *template.Template, name string, data map[string]interface{}) message.Content {
 	return &cardCustom{
 		tmpl: tmpl,
 		name: name,

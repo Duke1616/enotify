@@ -14,20 +14,28 @@ import (
 
 const feishuApiURL = "https://qyapi.weixin.qq.com/cgi-bin/"
 
-type Notifier struct {
+type CreateNotify struct {
 	logger *elog.Component
 	url    *url.URL
 
 	larkC *lark.Client
 }
 
-// NewFeishuNotify SDK 使用文档：https://github.com/larksuite/oapi-sdk-go/tree/v3_main
-func NewFeishuNotify(appId, appSecret string, opts ...lark.ClientOptionFunc) (notify.Notifier[*larkim.CreateMessageReq], error) {
+type UpdateNotify struct {
+	logger *elog.Component
+	url    *url.URL
+
+	larkC *lark.Client
+}
+
+// NewCreateFeishuNotify SDK 使用文档：https://github.com/larksuite/oapi-sdk-go/tree/v3_main
+func NewCreateFeishuNotify(appId, appSecret string, opts ...lark.ClientOptionFunc) (
+	notify.Notifier[*larkim.CreateMessageReq], error) {
 	if appId == "" || appSecret == "" {
 		return nil, errors.New("appId and appSecret must not be empty")
 	}
 
-	n := &Notifier{
+	n := &CreateNotify{
 		larkC:  lark.NewClient(appId, appSecret, opts...),
 		logger: elog.DefaultLogger,
 	}
@@ -36,16 +44,45 @@ func NewFeishuNotify(appId, appSecret string, opts ...lark.ClientOptionFunc) (no
 	return n, nil
 }
 
-func NewFeishuNotifyByClient(client *lark.Client) (notify.Notifier[*larkim.CreateMessageReq], error) {
-	n := &Notifier{
-		larkC:  client,
+func NewUpdateFeishuNotify(appId, appSecret string, opts ...lark.ClientOptionFunc) (
+	notify.Notifier[*larkim.UpdateMessageReq], error) {
+	if appId == "" || appSecret == "" {
+		return nil, errors.New("appId and appSecret must not be empty")
+	}
+
+	n := &UpdateNotify{
+		larkC:  lark.NewClient(appId, appSecret, opts...),
 		logger: elog.DefaultLogger,
 	}
 
+	// 返回接口类型
 	return n, nil
 }
 
-func (n *Notifier) Send(ctx context.Context, notify notify.BasicNotificationMessage[*larkim.CreateMessageReq]) (bool, error) {
+func (n *UpdateNotify) Send(ctx context.Context, notify notify.BasicNotificationMessage[*larkim.UpdateMessageReq]) (
+	bool, error) {
+	msg, err := notify.Message()
+	if err != nil {
+		return false, err
+	}
+
+	resp, err := n.larkC.Im.Message.Update(ctx, msg)
+	if err != nil {
+		return false, err
+
+	}
+
+	if !resp.Success() {
+		return false, fmt.Errorf("发送消息失败： Code: %d, Msg: %s, requestId: %s",
+			resp.Code, resp.Msg, resp.RequestId())
+	}
+
+	fmt.Println(larkcore.Prettify(resp))
+	return true, nil
+}
+
+func (n *CreateNotify) Send(ctx context.Context, notify notify.BasicNotificationMessage[*larkim.CreateMessageReq]) (
+	bool, error) {
 	msg, err := notify.Message()
 	if err != nil {
 		return false, err
