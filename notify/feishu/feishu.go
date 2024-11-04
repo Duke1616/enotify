@@ -44,6 +44,24 @@ func NewCreateFeishuNotify(appId, appSecret string, opts ...lark.ClientOptionFun
 	return n, nil
 }
 
+func NewCreateFeishuNotifyByClient(client *lark.Client) (notify.Notifier[*larkim.CreateMessageReq], error) {
+	n := &CreateNotify{
+		larkC:  client,
+		logger: elog.DefaultLogger,
+	}
+
+	return n, nil
+}
+
+func NewUpdateFeishuNotifyByClient(client *lark.Client) (notify.Notifier[*larkim.UpdateMessageReq], error) {
+	n := &CreateNotify{
+		larkC:  client,
+		logger: elog.DefaultLogger,
+	}
+
+	return n, nil
+}
+
 func NewUpdateFeishuNotify(appId, appSecret string, opts ...lark.ClientOptionFunc) (
 	notify.Notifier[*larkim.UpdateMessageReq], error) {
 	if appId == "" || appSecret == "" {
