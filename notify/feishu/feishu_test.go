@@ -74,6 +74,18 @@ func (s *FeishuNotifyTestSuite) TestFeishuMessage() {
 			wantResult: true,
 		},
 		{
+			name: "工单审批同意-卡片消息",
+			wrap: notify.WrapNotifierStatic(s.notify, NewFeishuMessage("user_id", "bcegag66",
+				NewFeishuCustomCard(s.tmpl, "feishu-card-want", card.NewApprovalCardBuilder().SetToTitle("德玛西亚").SetToFields([]card.Field{
+					{
+						IsShort: false,
+						Tag:     "plain_text",
+						Content: "字段1内容",
+					},
+				}).SetWantResult("你已同意该休假申请，并批注：好的，玩得开心").Build()))),
+			wantResult: true,
+		},
+		{
 			name: "发送生成模版-静态卡片消息",
 			wrap: notify.WrapNotifierStatic(s.notify, NewFeishuMessage("user_id", "bcegag66", NewFeishuTemplateCard(
 				"AAqCtHtCQMglP", "1.0.1", map[string]string{
