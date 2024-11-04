@@ -22,7 +22,9 @@ func (f *CreateFeishuMessage) Message() (*larkim.CreateMessageReq, error) {
 		Body(larkim.NewCreateMessageReqBodyBuilder().
 			ReceiveId(f.ReceiveId).
 			MsgType(f.MsgType).
-			Content(f.Content).Build()).Build(), nil
+			Content(f.Content).
+			Build()).
+		Build(), nil
 }
 
 func NewCreateFeishuMessage(ReceiveIdType, ReceiveId string, c Content) *CreateFeishuMessage {

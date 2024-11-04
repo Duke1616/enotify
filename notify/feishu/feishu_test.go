@@ -25,7 +25,7 @@ type FeishuNotifyTestSuite struct {
 	suite.Suite
 	tmpl         *template.Template
 	createNotify notify.Notifier[*larkim.CreateMessageReq]
-	updateNotify notify.Notifier[*larkim.UpdateMessageReq]
+	updateNotify notify.Notifier[*larkim.PatchMessageReq]
 }
 
 func (s *FeishuNotifyTestSuite) SetupSuite() {
@@ -42,7 +42,7 @@ func (s *FeishuNotifyTestSuite) SetupSuite() {
 	s.createNotify, err = NewCreateFeishuNotify(appId, appSecret)
 	require.NoError(s.T(), err)
 
-	s.updateNotify, err = NewUpdateFeishuNotify(appId, appSecret)
+	s.updateNotify, err = NewPatchFeishuNotify(appId, appSecret)
 	require.NoError(s.T(), err)
 
 	s.tmpl, err = template.FromGlobs([]string{})
@@ -120,7 +120,7 @@ func (s *FeishuNotifyTestSuite) TestUpdateFeishuMessage() {
 	}{
 		{
 			name: "工单审批修改-卡片消息",
-			wrap: notify.WrapNotifierStatic(s.updateNotify, message.NewUpdateFeishuMessage("om_b434eb31ac949dec8ffdfc2b1cae787a ",
+			wrap: notify.WrapNotifierStatic(s.updateNotify, message.NewPatchFeishuMessage("om_2bd4af328d5a0c33c02290e59be98a72",
 				NewFeishuCustomCard(s.tmpl, "feishu-card-want", card.NewApprovalCardBuilder().SetToTitle("德玛西亚").SetToFields([]card.Field{
 					{
 						IsShort: false,

@@ -21,7 +21,7 @@ type CreateNotify struct {
 	larkC *lark.Client
 }
 
-type UpdateNotify struct {
+type PatchNotify struct {
 	logger *elog.Component
 	url    *url.URL
 
@@ -53,8 +53,8 @@ func NewCreateFeishuNotifyByClient(client *lark.Client) (notify.Notifier[*larkim
 	return n, nil
 }
 
-func NewUpdateFeishuNotifyByClient(client *lark.Client) (notify.Notifier[*larkim.UpdateMessageReq], error) {
-	n := &UpdateNotify{
+func NewPatchFeishuNotifyByClient(client *lark.Client) (notify.Notifier[*larkim.PatchMessageReq], error) {
+	n := &PatchNotify{
 		larkC:  client,
 		logger: elog.DefaultLogger,
 	}
@@ -62,13 +62,13 @@ func NewUpdateFeishuNotifyByClient(client *lark.Client) (notify.Notifier[*larkim
 	return n, nil
 }
 
-func NewUpdateFeishuNotify(appId, appSecret string, opts ...lark.ClientOptionFunc) (
-	notify.Notifier[*larkim.UpdateMessageReq], error) {
+func NewPatchFeishuNotify(appId, appSecret string, opts ...lark.ClientOptionFunc) (
+	notify.Notifier[*larkim.PatchMessageReq], error) {
 	if appId == "" || appSecret == "" {
 		return nil, errors.New("appId and appSecret must not be empty")
 	}
 
-	n := &UpdateNotify{
+	n := &PatchNotify{
 		larkC:  lark.NewClient(appId, appSecret, opts...),
 		logger: elog.DefaultLogger,
 	}
@@ -77,14 +77,14 @@ func NewUpdateFeishuNotify(appId, appSecret string, opts ...lark.ClientOptionFun
 	return n, nil
 }
 
-func (n *UpdateNotify) Send(ctx context.Context, notify notify.BasicNotificationMessage[*larkim.UpdateMessageReq]) (
+func (n *PatchNotify) Send(ctx context.Context, notify notify.BasicNotificationMessage[*larkim.PatchMessageReq]) (
 	bool, error) {
 	msg, err := notify.Message()
 	if err != nil {
 		return false, err
 	}
 
-	resp, err := n.larkC.Im.Message.Update(ctx, msg)
+	resp, err := n.larkC.Im.Message.Patch(ctx, msg)
 	if err != nil {
 		return false, err
 
