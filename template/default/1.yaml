@@ -1,0 +1,48 @@
+{
+  "templateId": "",
+  "content": {
+    "elements": [{
+      "tag": "column_set",
+      "flex_mode": "none",
+      "background_style": "default",
+      "columns": [{
+        "tag": "column",
+        "width": "weighted",
+        "weight": 1,
+        "vertical_align": "top",
+        "elements": [{
+          "tag": "markdown",
+          "content": "**审批人：** @张三"
+        }]
+      }, {
+        "tag": "column",
+        "width": "weighted",
+        "weight": 1,
+        "vertical_align": "top",
+        "elements": [{
+          "tag": "markdown",
+          "content": "**状态：<font color='green'> 审批中 </font>**"
+        }]
+      }]
+    }, {
+      "tag": "img",
+      "img_key": "img_v2_74ca810e-e59e-4b47-82a1-fc227fe66a8g",
+      "alt": {
+        "tag": "plain_text",
+        "content": ""
+      },
+      "mode": "fit_horizontal",
+      "preview": true,
+      "compact_width": false
+    }],
+    "header": {
+      "template": "carmine",
+      "title": {
+        "content": "请与各角色沟通项目细节",
+        "tag": "plain_text"
+      }
+    }
+  },
+  "mock_data": "{}",
+  "variables": []
+}

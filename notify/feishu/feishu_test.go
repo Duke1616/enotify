@@ -100,6 +100,21 @@ func (s *FeishuNotifyTestSuite) TestCreateFeishuMessage() {
 			wantResult: true,
 		},
 		{
+			name: "发送自定义-卡片消息-图片返回",
+			wrap: notify.WrapNotifierStatic(s.createNotify, message.NewCreateFeishuMessage("user_id", "bcegag66",
+				NewFeishuCustomCard(s.tmpl, "feishu-card-progress-image-result", card.NewApprovalCardBuilder().SetToTitle("德玛西亚").SetToFields([]card.Field{
+					{
+						Tag:     "markdown",
+						Content: `**审批人：** <at id=a579e467></at>`,
+					},
+					{
+						Tag:     "markdown",
+						Content: `**状态：<font color='green'> 审批中 </font>**`,
+					},
+				}).SetImageKey("img_v2_74ca810e-e59e-4b47-82a1-fc227fe66a8g").Build()))),
+			wantResult: true,
+		},
+		{
 			name: "发送生成模版-静态卡片消息",
 			wrap: notify.WrapNotifierStatic(s.createNotify, message.NewCreateFeishuMessage("user_id", "bcegag66", NewFeishuTemplateCard(
 				"AAqCtHtCQMglP", "1.0.1", map[string]string{

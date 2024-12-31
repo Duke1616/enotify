@@ -1,4 +1,4 @@
-{{ define "feishu-card-progress-want" }}
+{{ define "feishu-card-progress" }}
 {
   "schema": "2.0",
   "config": {
@@ -44,11 +44,11 @@
         },
         "extra": {
           "tag": "button",
-          "name": "progress",
           "text": {
             "tag": "lark_md",
             "content": "查看进度"
           },
+          "name": "progress",
           "value": {
             {{- range $index, $callback := .CallbackValue}}
             "{{$callback.Key}}": "{{$callback.Value}}"{{if not (last $index $.CallbackValue)}},{{end}}

@@ -3,6 +3,7 @@ package template
 import (
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
+	"html/template"
 	"reflect"
 	"regexp"
 	"strings"
@@ -49,5 +50,8 @@ var DefaultFuncs = FuncMap{
 	"last": func(index int, slice interface{}) bool {
 		v := reflect.ValueOf(slice)
 		return index == v.Len()-1
+	},
+	"safeHTML": func(html string) template.HTML {
+		return template.HTML(html)
 	},
 }

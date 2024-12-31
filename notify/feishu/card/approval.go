@@ -8,6 +8,7 @@ type Builder interface {
 	SetToFields(Fields []Field) Builder
 	SetToHideForm(hideForm bool) Builder
 	SetToCallbackValue(callbackValues []Value) Builder
+	SetImageKey(imageKey string) Builder
 	SetWantResult(content string) Builder
 }
 
@@ -22,6 +23,7 @@ type Approval struct {
 	CallbackValue []Value `json:"callback_value"`
 	HideForm      bool    `json:"hide_form"`
 	Title         string  `json:"title"`
+	ImageKey      string  `json:"image_key"`
 	WantContent   string  `json:"want_content"`
 }
 
@@ -41,6 +43,7 @@ func (a *Approval) Build() map[string]interface{} {
 			}
 		}),
 		"WantContent": a.WantContent,
+		"ImageKey":    a.ImageKey,
 		"Fields": slice.Map(a.Fields, func(idx int, src Field) map[string]interface{} {
 			return map[string]interface{}{
 				"IsShort": src.IsShort,
@@ -49,6 +52,11 @@ func (a *Approval) Build() map[string]interface{} {
 			}
 		}),
 	}
+}
+
+func (a *Approval) SetImageKey(imageKey string) Builder {
+	a.ImageKey = imageKey
+	return a
 }
 
 func (a *Approval) SetToHideForm(hideForm bool) Builder {
