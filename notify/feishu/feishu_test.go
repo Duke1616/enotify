@@ -79,6 +79,27 @@ func (s *FeishuNotifyTestSuite) TestCreateFeishuMessage() {
 			wantResult: true,
 		},
 		{
+			name: "发送自定义-卡片消息-流程反馈",
+			wrap: notify.WrapNotifierStatic(s.createNotify, message.NewCreateFeishuMessage("user_id", "bcegag66",
+				NewFeishuCustomCard(s.tmpl, "feishu-card-progress-want", card.NewApprovalCardBuilder().SetToTitle("德玛西亚").SetToFields([]card.Field{
+					{
+						IsShort: false,
+						Tag:     "plain_text",
+						Content: "字段1内容",
+					},
+				}).SetToCallbackValue([]card.Value{
+					{
+						Key:   "task_id",
+						Value: "10",
+					},
+					{
+						Key:   "user_id",
+						Value: "123",
+					},
+				}).SetToHideForm(false).SetWantResult("你已同意该申请, 批注：无").Build()))),
+			wantResult: true,
+		},
+		{
 			name: "发送生成模版-静态卡片消息",
 			wrap: notify.WrapNotifierStatic(s.createNotify, message.NewCreateFeishuMessage("user_id", "bcegag66", NewFeishuTemplateCard(
 				"AAqCtHtCQMglP", "1.0.1", map[string]string{
