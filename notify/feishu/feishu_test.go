@@ -100,18 +100,39 @@ func (s *FeishuNotifyTestSuite) TestCreateFeishuMessage() {
 			wantResult: true,
 		},
 		{
+			name: "发送自定义-卡片消息-撤销",
+			wrap: notify.WrapNotifierStatic(s.createNotify, message.NewCreateFeishuMessage("user_id", "bcegag66",
+				NewFeishuCustomCard(s.tmpl, "feishu-card-revoke", card.NewApprovalCardBuilder().SetToTitle("德玛西亚").SetToFields([]card.Field{
+					{
+						IsShort: false,
+						Tag:     "plain_text",
+						Content: "字段1内容",
+					},
+				}).SetToCallbackValue([]card.Value{
+					{
+						Key:   "task_id",
+						Value: "10",
+					},
+					{
+						Key:   "user_id",
+						Value: "123",
+					},
+				}).SetToHideForm(false).Build()))),
+			wantResult: true,
+		},
+		{
 			name: "发送自定义-卡片消息-图片返回",
 			wrap: notify.WrapNotifierStatic(s.createNotify, message.NewCreateFeishuMessage("user_id", "bcegag66",
 				NewFeishuCustomCard(s.tmpl, "feishu-card-progress-image-result", card.NewApprovalCardBuilder().SetToTitle("德玛西亚").SetToFields([]card.Field{
 					{
 						Tag:     "markdown",
-						Content: `**审批人：** <at id=a579e467></at>`,
+						Content: `**审批人：** <at id=bcegag66></at>`,
 					},
 					{
 						Tag:     "markdown",
 						Content: `**状态：<font color='green'> 审批中 </font>**`,
 					},
-				}).SetImageKey("img_v2_74ca810e-e59e-4b47-82a1-fc227fe66a8g").Build()))),
+				}).SetImageKey("img_v3_02i3_b7f2bbb1-8b07-4b80-aa01-8db89bb99cbg").Build()))),
 			wantResult: true,
 		},
 		{
