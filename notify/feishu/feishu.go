@@ -9,7 +9,6 @@ import (
 	"github.com/Duke1616/enotify/notify"
 	"github.com/gotomicro/ego/core/elog"
 	"github.com/larksuite/oapi-sdk-go/v3"
-	"github.com/larksuite/oapi-sdk-go/v3/core"
 	larkim "github.com/larksuite/oapi-sdk-go/v3/service/im/v1"
 )
 
@@ -86,7 +85,6 @@ func (n *PatchNotify) Send(ctx context.Context, notify notify.BasicNotificationM
 			resp.Code, resp.Msg, resp.RequestId())
 	}
 
-	fmt.Println(larkcore.Prettify(resp))
 	return true, nil
 }
 
@@ -108,6 +106,5 @@ func (n *CreateNotify) Send(ctx context.Context, notify notify.BasicNotification
 			resp.Code, resp.Msg, resp.RequestId())
 	}
 
-	fmt.Println(larkcore.Prettify(resp))
 	return true, nil
 }

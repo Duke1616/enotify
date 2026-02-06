@@ -3,7 +3,7 @@ package email
 import (
 	"context"
 	"crypto/tls"
-	"fmt"
+
 	"github.com/Duke1616/enotify/notify"
 	"github.com/gotomicro/ego/core/elog"
 	"gopkg.in/gomail.v2"
@@ -48,7 +48,6 @@ func (n *Notifier) Send(ctx context.Context, notify notify.BasicNotificationMess
 
 	// 发送邮件
 	if err = d.DialAndSend(m); err != nil {
-		fmt.Println("Error sending email:", err)
 		return false, err
 	}
 

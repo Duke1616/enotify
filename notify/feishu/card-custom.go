@@ -1,7 +1,6 @@
 package feishu
 
 import (
-	"fmt"
 	"github.com/Duke1616/enotify/notify/feishu/message"
 	"github.com/Duke1616/enotify/template"
 )
@@ -18,9 +17,6 @@ func (c *cardCustom) Builder() (string, error) {
 	if err != nil {
 		return "", err
 	}
-
-	// 打印生成的 JSON 字符串
-	fmt.Println(execute)
 
 	return execute, nil
 }
