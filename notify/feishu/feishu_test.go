@@ -2,6 +2,11 @@ package feishu
 
 import (
 	"context"
+	"log"
+	"os"
+	"testing"
+	"time"
+
 	"github.com/Duke1616/enotify/notify"
 	"github.com/Duke1616/enotify/notify/feishu/card"
 	"github.com/Duke1616/enotify/notify/feishu/message"
@@ -11,10 +16,6 @@ import (
 	"github.com/magiconair/properties/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
-	"log"
-	"os"
-	"testing"
-	"time"
 )
 
 func TestFeishuNotify(t *testing.T) {
@@ -39,17 +40,20 @@ func (s *FeishuNotifyTestSuite) SetupSuite() {
 		s.T().Fatal()
 	}
 
-	s.createNotify, err = NewCreateFeishuNotify(appId, appSecret)
+	lark, err := NewLarkClient(appId, appSecret)
 	require.NoError(s.T(), err)
 
-	s.updateNotify, err = NewPatchFeishuNotify(appId, appSecret)
+	s.createNotify, err = NewCreateLarkNotifyByClient(lark)
+	require.NoError(s.T(), err)
+
+	s.updateNotify, err = NewPatchLarkNotifyByClient(lark)
 	require.NoError(s.T(), err)
 
 	s.tmpl, err = template.FromGlobs([]string{})
 	require.NoError(s.T(), err)
 }
 
-func (s *FeishuNotifyTestSuite) TestCreateFeishuMessage() {
+func (s *FeishuNotifyTestSuite) TestCreateLarkMessage() {
 	t := s.T()
 
 	testCases := []struct {
@@ -167,7 +171,7 @@ func (s *FeishuNotifyTestSuite) TestCreateFeishuMessage() {
 	}
 }
 
-func (s *FeishuNotifyTestSuite) TestUpdateFeishuMessage() {
+func (s *FeishuNotifyTestSuite) TestUpdateLarkMessage() {
 	t := s.T()
 
 	testCases := []struct {

@@ -68,21 +68,6 @@ func NewPatchLarkNotifyByClient(client *lark.Client) (notify.Notifier[*larkim.Pa
 	return n, nil
 }
 
-func NewPatchFeishuNotify(appId, appSecret string, opts ...lark.ClientOptionFunc) (
-	notify.Notifier[*larkim.PatchMessageReq], error) {
-	if appId == "" || appSecret == "" {
-		return nil, errors.New("appId and appSecret must not be empty")
-	}
-
-	n := &PatchNotify{
-		larkC:  lark.NewClient(appId, appSecret, opts...),
-		logger: elog.DefaultLogger,
-	}
-
-	// 返回接口类型
-	return n, nil
-}
-
 func (n *PatchNotify) Send(ctx context.Context, notify notify.BasicNotificationMessage[*larkim.PatchMessageReq]) (
 	bool, error) {
 	msg, err := notify.Message()
