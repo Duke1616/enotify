@@ -106,6 +106,65 @@ func (s *HandlerTestSuite) TestSendPatch() {
 	require.NoError(t, err)
 }
 
+func (s *HandlerTestSuite) TestSendWithForm() {
+	t := s.T()
+
+	// 构造 Create 消息
+	msg := &notify.Message{
+		To: []string{"bcegag66"}, // 替换为真实的 UserID/OpenID
+	}
+	WithOptions(msg, Options{
+		Action:        ActionCreate,
+		ReceiveIDType: ReceiveIDTypeUserID,
+		Content: NewFeishuCustomCard(s.tmpl, "feishu-card-callback", card.NewApprovalCardBuilder().
+			SetToTitle("Handler Test Form").
+			SetInputFields([]card.InputField{
+				{
+					Name:     "Reason",
+					Key:      "reason",
+					Type:     card.FieldTextarea,
+					Required: true,
+					Props: map[string]string{
+						"placeholder": "请输入申请理由",
+					},
+				},
+				{
+					Name:     "Date",
+					Key:      "date",
+					Type:     card.FieldDate,
+					Required: true,
+				},
+				{
+					Name:     "Level",
+					Key:      "level",
+					Type:     card.FieldSelect,
+					Required: true,
+					Options: []card.InputOption{
+						{Label: "Low", Value: "low"},
+						{Label: "High", Value: "high"},
+					},
+				},
+				{
+					Name:     "Tags",
+					Key:      "tags",
+					Type:     card.FieldMultiSelect,
+					Required: false,
+					Options: []card.InputOption{
+						{Label: "Urgent", Value: "urgent"},
+						{Label: "Work", Value: "work"},
+					},
+				},
+			}).
+			SetToHideForm(false).Build()),
+	})
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
+	defer cancel()
+
+	err := s.handler.Send(ctx, msg)
+	require.NoError(t, err)
+}
+
 func init() {
 	err := godotenv.Load()
 	if err != nil {

@@ -36,6 +36,106 @@
         "tag": "form",
         "name": "approval",
         "elements": [
+          {{- range $rowIndex, $row := .InputRows}}
+          {
+            "tag": "column_set",
+            "flex_mode": "bisect",
+            "background_style": "default",
+            "horizontal_spacing": "8px",
+            "columns": [
+              {{- range $colIndex, $input := $row}}
+              {
+                "tag": "column",
+                "width": "weighted",
+                "weight": 1,
+                "vertical_align": "top",
+                "elements": [
+                  {
+                    "tag": "div",
+                    "text": {
+                      "tag": "lark_md",
+                      "content": "{{$input.Name}}{{if $input.Required}}<font color='red'>*</font>{{end}}",
+                      "text_size": "normal"
+                    }
+                  },
+                  {{- if or (eq $input.Type "input") (eq $input.Type "textarea") (eq $input.Type "number") }}
+                  {
+                    "tag": "input",
+                    "name": "{{$input.Key}}",
+                    "placeholder": {
+                      "tag": "plain_text",
+                      "content": "{{ if index $input.Props "placeholder" }}{{ index $input.Props "placeholder" }}{{ else }}请输入{{end}}"
+                    },
+                    "width": "fill",
+                    "required": false
+                  }
+                  {{- else if eq $input.Type "date" }}
+                  {
+                    "tag": "picker_datetime",
+                    "name": "{{$input.Key}}",
+                    "placeholder": {
+                      "tag": "plain_text",
+                      "content": "{{ if index $input.Props "placeholder" }}{{ index $input.Props "placeholder" }}{{ else }}请选择{{end}}"
+                    },
+                    "width": "default",
+                    "required": false
+                  }
+                  {{- else if eq $input.Type "select" }}
+                  {
+                    "tag": "select_static",
+                    "name": "{{$input.Key}}",
+                    "placeholder": {
+                      "tag": "plain_text",
+                      "content": "{{ if index $input.Props "placeholder" }}{{ index $input.Props "placeholder" }}{{ else }}请选择{{end}}"
+                    },
+                    "options": [
+                      {{- range $optIndex, $opt := $input.Options}}
+                      {
+                        "text": {
+                            "tag": "plain_text",
+                            "content": "{{$opt.Label}}"
+                        },
+                        "value": "{{$opt.Value}}"
+                      }{{if not (last $optIndex $input.Options)}},{{end}}
+                      {{- end}}
+                    ],
+                    "width": "default",
+                    "required": false
+                  }
+                  {{- else if eq $input.Type "multi_select" }}
+                  {
+                    "tag": "multi_select_static",
+                    "name": "{{$input.Key}}",
+                    "placeholder": {
+                      "tag": "plain_text",
+                      "content": "{{ if index $input.Props "placeholder" }}{{ index $input.Props "placeholder" }}{{ else }}请选择{{end}}"
+                    },
+                    "options": [
+                      {{- range $optIndex, $opt := $input.Options}}
+                      {
+                        "text": {
+                            "tag": "plain_text",
+                            "content": "{{$opt.Label}}"
+                        },
+                        "value": "{{$opt.Value}}"
+                      }{{if not (last $optIndex $input.Options)}},{{end}}
+                      {{- end}}
+                    ],
+                    "width": "default",
+                    "required": false
+                  }
+                  {{- end}}
+                ]
+              }{{if not (last $colIndex $row)}},{{end}}
+              {{- end}}
+            ]
+          }{{if not (last $rowIndex $.InputRows)}},{{end}}
+          {{- end}}
+          {{- if .InputRows }},
+          {
+            "tag": "hr"
+          },
+          {{- end}}
           {
             "tag": "input",
             "name": "comment",
@@ -44,7 +144,8 @@
               "content": "请输入审批备注，选填"
             },
             "max_length": 200,
-            "width": "fill"
+            "width": "fill",
+            "required": false
           },
           {
             "tag": "column_set",
