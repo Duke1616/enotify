@@ -57,36 +57,36 @@
                       "content": "{{$input.Name}}{{if $input.Required}}<font color='red'>*</font>{{end}}",
                       "text_size": "normal"
                     }
-                  },
+                  }
                   {{- if or (eq $input.Type "input") (eq $input.Type "textarea") (eq $input.Type "number") }}
-                  {
+                  ,{
                     "tag": "input",
                     "name": "{{$input.Key}}",
                     "placeholder": {
                       "tag": "plain_text",
-                      "content": "{{ if index $input.Props "placeholder" }}{{ index $input.Props "placeholder" }}{{ else }}请输入{{end}}"
+                      "content": "{{ if and $input.Props (index $input.Props "placeholder") }}{{ index $input.Props "placeholder" }}{{ else }}请输入{{end}}"
                     },
                     "width": "fill",
                     "required": false
                   }
                   {{- else if eq $input.Type "date" }}
-                  {
+                  ,{
                     "tag": "picker_datetime",
                     "name": "{{$input.Key}}",
                     "placeholder": {
                       "tag": "plain_text",
-                      "content": "{{ if index $input.Props "placeholder" }}{{ index $input.Props "placeholder" }}{{ else }}请选择{{end}}"
+                      "content": "{{ if and $input.Props (index $input.Props "placeholder") }}{{ index $input.Props "placeholder" }}{{ else }}请选择{{end}}"
                     },
                     "width": "default",
                     "required": false
                   }
                   {{- else if eq $input.Type "select" }}
-                  {
+                  ,{
                     "tag": "select_static",
                     "name": "{{$input.Key}}",
                     "placeholder": {
                       "tag": "plain_text",
-                      "content": "{{ if index $input.Props "placeholder" }}{{ index $input.Props "placeholder" }}{{ else }}请选择{{end}}"
+                      "content": "{{ if and $input.Props (index $input.Props "placeholder") }}{{ index $input.Props "placeholder" }}{{ else }}请选择{{end}}"
                     },
                     "options": [
                       {{- range $optIndex, $opt := $input.Options}}
@@ -103,12 +103,12 @@
                     "required": false
                   }
                   {{- else if eq $input.Type "multi_select" }}
-                  {
+                  ,{
                     "tag": "multi_select_static",
                     "name": "{{$input.Key}}",
                     "placeholder": {
                       "tag": "plain_text",
-                      "content": "{{ if index $input.Props "placeholder" }}{{ index $input.Props "placeholder" }}{{ else }}请选择{{end}}"
+                      "content": "{{ if and $input.Props (index $input.Props "placeholder") }}{{ index $input.Props "placeholder" }}{{ else }}请选择{{end}}"
                     },
                     "options": [
                       {{- range $optIndex, $opt := $input.Options}}

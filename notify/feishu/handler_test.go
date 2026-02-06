@@ -7,7 +7,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Duke1616/enotify/notify"
 	"github.com/Duke1616/enotify/notify/feishu/card"
 	"github.com/Duke1616/enotify/template"
 	"github.com/joho/godotenv"
@@ -51,13 +50,9 @@ func (s *HandlerTestSuite) TestSendCreate() {
 	t := s.T()
 
 	// 构造 Create 消息
-	msg := &notify.Message{
-		To: []string{"bcegag66"}, // 替换为真实的 UserID/OpenID
-	}
-	WithOptions(msg, Options{
-		Action:        ActionCreate,
-		ReceiveIDType: ReceiveIDTypeUserID,
-		Content: NewFeishuCustomCard(s.tmpl, "feishu-card-callback", card.NewApprovalCardBuilder().
+	msg := NewCreateBuilder("bcegag66"). // 替换为真实的 UserID/OpenID
+		SetReceiveIDType(ReceiveIDTypeUserID).
+		SetContent(NewFeishuCustomCard(s.tmpl, "feishu-card-callback", card.NewApprovalCardBuilder().
 			SetToTitle("Handler Test Create").SetToFields([]card.Field{
 			{
 				IsShort: false,
@@ -69,8 +64,8 @@ func (s *HandlerTestSuite) TestSendCreate() {
 				Key:   "task_id",
 				Value: "100",
 			},
-		}).SetToHideForm(false).Build()),
-	})
+		}).SetToHideForm(false).Build())).
+		Build()
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
 	defer cancel()
@@ -84,12 +79,8 @@ func (s *HandlerTestSuite) TestSendPatch() {
 
 	// 构造 Patch 消息
 	// 注意：Patch 需要真实的 MessageID
-	msg := &notify.Message{
-		To: []string{"om_2bd4af328d5a0c33c02290e59be98a72"}, // MessageID
-	}
-	WithOptions(msg, Options{
-		Action: ActionPatch,
-		Content: NewFeishuCustomCard(s.tmpl, "feishu-card-want", card.NewApprovalCardBuilder().
+	msg := NewPatchBuilder("om_2bd4af328d5a0c33c02290e59be98a72"). // MessageID
+		SetContent(NewFeishuCustomCard(s.tmpl, "feishu-card-want", card.NewApprovalCardBuilder().
 			SetToTitle("Handler Test Patch").SetToFields([]card.Field{
 			{
 				IsShort: false,
@@ -98,8 +89,8 @@ func (s *HandlerTestSuite) TestSendPatch() {
 			},
 		}).SetToCallbackValue([]card.Value{
 			// Note: 原始代码这里没有 Callback Value，我保持原样，如果有的话加上
-		}).SetWantResult("通过 Handler 更新成功").Build()),
-	})
+		}).SetWantResult("通过 Handler 更新成功").Build())).
+		Build()
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
 	defer cancel()
@@ -111,14 +102,10 @@ func (s *HandlerTestSuite) TestSendPatch() {
 func (s *HandlerTestSuite) TestSendWithForm() {
 	t := s.T()
 
-	// 构造 Create 消息
-	msg := &notify.Message{
-		To: []string{"bcegag66"}, // 替换为真实的 UserID/OpenID
-	}
-	WithOptions(msg, Options{
-		Action:        ActionCreate,
-		ReceiveIDType: ReceiveIDTypeUserID,
-		Content: NewFeishuCustomCard(s.tmpl, "feishu-card-callback", card.NewApprovalCardBuilder().
+	// 使用 Builder 模式构造消息
+	msg := NewCreateBuilder("bcegag66").
+		SetReceiveIDType(ReceiveIDTypeUserID).
+		SetContent(NewFeishuCustomCard(s.tmpl, "feishu-card-callback", card.NewApprovalCardBuilder().
 			SetToTitle("Handler Test Form").
 			SetInputFields([]card.InputField{
 				{
@@ -157,8 +144,8 @@ func (s *HandlerTestSuite) TestSendWithForm() {
 					},
 				},
 			}).
-			SetToHideForm(false).Build()),
-	})
+			SetToHideForm(false).Build())).
+		Build()
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
 	defer cancel()
