@@ -4,12 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/url"
+
 	"github.com/Duke1616/enotify/notify"
 	"github.com/gotomicro/ego/core/elog"
 	"github.com/larksuite/oapi-sdk-go/v3"
 	"github.com/larksuite/oapi-sdk-go/v3/core"
 	larkim "github.com/larksuite/oapi-sdk-go/v3/service/im/v1"
-	"net/url"
 )
 
 const feishuApiURL = "https://qyapi.weixin.qq.com/cgi-bin/"
@@ -28,12 +29,17 @@ type PatchNotify struct {
 	larkC *lark.Client
 }
 
-// NewCreateFeishuNotify SDK 使用文档：https://github.com/larksuite/oapi-sdk-go/tree/v3_main
-func NewCreateFeishuNotify(appId, appSecret string, opts ...lark.ClientOptionFunc) (
-	notify.Notifier[*larkim.CreateMessageReq], error) {
+func NewLarkClient(appId, appSecret string, opts ...lark.ClientOptionFunc) (*lark.Client, error) {
 	if appId == "" || appSecret == "" {
 		return nil, errors.New("appId and appSecret must not be empty")
 	}
+
+	return lark.NewClient(appId, appSecret, opts...), nil
+}
+
+// NewCreateLarkClient SDK 使用文档：https://github.com/larksuite/oapi-sdk-go/tree/v3_main
+func NewCreateLarkClient(appId, appSecret string, opts ...lark.ClientOptionFunc) (
+	notify.Notifier[*larkim.CreateMessageReq], error) {
 
 	n := &CreateNotify{
 		larkC:  lark.NewClient(appId, appSecret, opts...),
@@ -44,7 +50,7 @@ func NewCreateFeishuNotify(appId, appSecret string, opts ...lark.ClientOptionFun
 	return n, nil
 }
 
-func NewCreateFeishuNotifyByClient(client *lark.Client) (notify.Notifier[*larkim.CreateMessageReq], error) {
+func NewCreateLarkNotifyByClient(client *lark.Client) (notify.Notifier[*larkim.CreateMessageReq], error) {
 	n := &CreateNotify{
 		larkC:  client,
 		logger: elog.DefaultLogger,
@@ -53,7 +59,7 @@ func NewCreateFeishuNotifyByClient(client *lark.Client) (notify.Notifier[*larkim
 	return n, nil
 }
 
-func NewPatchFeishuNotifyByClient(client *lark.Client) (notify.Notifier[*larkim.PatchMessageReq], error) {
+func NewPatchLarkNotifyByClient(client *lark.Client) (notify.Notifier[*larkim.PatchMessageReq], error) {
 	n := &PatchNotify{
 		larkC:  client,
 		logger: elog.DefaultLogger,

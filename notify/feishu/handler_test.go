@@ -37,8 +37,10 @@ func (s *HandlerTestSuite) SetupSuite() {
 	if !ok {
 		s.T().Fatal("FEISHU_APP_SECRET environment variable not set")
 	}
+	lark, err := NewLarkClient(appId, appSecret)
+	require.NoError(s.T(), err)
 
-	s.handler, err = NewHandler(appId, appSecret)
+	s.handler, err = NewHandler(lark)
 	require.NoError(s.T(), err)
 
 	s.tmpl, err = template.FromGlobs([]string{})

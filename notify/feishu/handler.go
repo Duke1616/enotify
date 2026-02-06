@@ -7,6 +7,7 @@ import (
 	"github.com/Duke1616/enotify/notify"
 	"github.com/Duke1616/enotify/notify/feishu/dispatch"
 	"github.com/Duke1616/enotify/notify/feishu/message"
+	lark "github.com/larksuite/oapi-sdk-go/v3"
 	larkim "github.com/larksuite/oapi-sdk-go/v3/service/im/v1"
 )
 
@@ -16,12 +17,13 @@ type Handler struct {
 	patchNotifier  notify.Notifier[*larkim.PatchMessageReq]
 }
 
-func NewHandler(appID, appSecret string) (*Handler, error) {
-	c, err := NewCreateFeishuNotify(appID, appSecret)
+func NewHandler(lark *lark.Client) (*Handler, error) {
+	c, err := NewCreateLarkNotifyByClient(lark)
 	if err != nil {
 		return nil, err
 	}
-	p, err := NewPatchFeishuNotify(appID, appSecret)
+
+	p, err := NewPatchLarkNotifyByClient(lark)
 	if err != nil {
 		return nil, err
 	}
