@@ -50,7 +50,7 @@ func (s *HandlerTestSuite) TestSendCreate() {
 	t := s.T()
 
 	// 构造 Create 消息
-	msg := NewCreateBuilder("bcegag66"). // 替换为真实的 UserID/OpenID
+	msg := NewCreateBuilder("bcegag66").
 		SetReceiveIDType(ReceiveIDTypeUserID).
 		SetContent(NewFeishuCustomCard(s.tmpl, "feishu-card-callback", card.NewApprovalCardBuilder().
 			SetToTitle("Handler Test Create").SetToFields([]card.Field{
@@ -79,7 +79,7 @@ func (s *HandlerTestSuite) TestSendPatch() {
 
 	// 构造 Patch 消息
 	// 注意：Patch 需要真实的 MessageID
-	msg := NewPatchBuilder("om_2bd4af328d5a0c33c02290e59be98a72"). // MessageID
+	msg := NewPatchBuilder("om_2bd4af328d5a0c33c02290e59be98a72").
 		SetContent(NewFeishuCustomCard(s.tmpl, "feishu-card-want", card.NewApprovalCardBuilder().
 			SetToTitle("Handler Test Patch").SetToFields([]card.Field{
 			{
