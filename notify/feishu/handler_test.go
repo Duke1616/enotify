@@ -105,7 +105,7 @@ func (s *HandlerTestSuite) TestSendWithForm() {
 	// 使用 Builder 模式构造消息
 	msg := NewCreateBuilder("bcegag66").
 		SetReceiveIDType(ReceiveIDTypeUserID).
-		SetContent(NewFeishuCustomCard(s.tmpl, "feishu-card-callback", card.NewApprovalCardBuilder().
+		SetContent(NewFeishuCustomCard(s.tmpl, "approval", card.NewApprovalCardBuilder().
 			SetToTitle("Handler Test Form").
 			SetInputFields([]card.InputField{
 				{
@@ -117,12 +117,12 @@ func (s *HandlerTestSuite) TestSendWithForm() {
 						"placeholder": "请输入申请理由",
 					},
 				},
-				{
-					Name:     "Date",
-					Key:      "date",
-					Type:     card.FieldDate,
-					Required: true,
-				},
+				//{
+				//	Name:     "Date",
+				//	Key:      "date",
+				//	Type:     card.FieldDate,
+				//	Required: true,
+				//},
 				{
 					Name:     "Level",
 					Key:      "level",
@@ -142,6 +142,19 @@ func (s *HandlerTestSuite) TestSendWithForm() {
 						{Label: "Urgent", Value: "urgent"},
 						{Label: "Work", Value: "work"},
 					},
+				},
+				{
+					Name:  "提示信息",
+					Key:   "tips_1",
+					Type:  card.FieldTips,
+					Value: "这是一段提示信息，只有展示作用",
+				},
+				{
+					Name:     "只读字段",
+					Key:      "readonly_1",
+					Type:     card.FieldInput,
+					Value:    "这是只读内容这是只读内容这是只读内容这是只读内容这是只读内容这是只读内容这是只读内容这是只读内容这是只读内容这是只读内容这是只读内容这是只读内容这是只读内容这是只读内容这是只读内容",
+					ReadOnly: true,
 				},
 			}).
 			SetToHideForm(false).Build())).

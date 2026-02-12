@@ -17,6 +17,8 @@ const (
 	FieldSelect FieldType = "select"
 	// FieldMultiSelect 多项选择
 	FieldMultiSelect FieldType = "multi_select"
+	// FieldTips 提示选项
+	FieldTips FieldType = "tips"
 )
 
 type InputOption struct {
@@ -31,6 +33,8 @@ type InputField struct {
 	Required bool              `json:"required"` // 是否必填
 	Options  []InputOption     `json:"options"`  // 选项列表（用于 select 等）
 	Props    map[string]string `json:"props"`    // 额外组件属性（如 placeholder）
+	Value    string            `json:"value"`    // 数据值
+	ReadOnly bool              `json:"readonly"` // 只读字段，比如提示用户时候使用
 }
 
 // Builder 审批卡片构建器接口
@@ -75,12 +79,25 @@ type Value struct {
 }
 
 func (a *Approval) Build() map[string]interface{} {
-	inputFieldsList := slice.Map(a.InputFields, func(idx int, src InputField) map[string]interface{} {
+	var tipsList []string
+	var filteredInputFields []InputField
+
+	for _, field := range a.InputFields {
+		if field.Type == FieldTips {
+			tipsList = append(tipsList, field.Value)
+		} else {
+			filteredInputFields = append(filteredInputFields, field)
+		}
+	}
+
+	inputFieldsList := slice.Map(filteredInputFields, func(idx int, src InputField) map[string]interface{} {
 		return map[string]interface{}{
 			"Name":     src.Name,
 			"Key":      src.Key,
 			"Type":     src.Type,
+			"Value":    src.Value,
 			"Required": src.Required,
+			"Readonly": src.ReadOnly,
 			"Options": slice.Map(src.Options, func(idx int, opt InputOption) map[string]interface{} {
 				return map[string]interface{}{
 					"Label": opt.Label,
@@ -92,12 +109,32 @@ func (a *Approval) Build() map[string]interface{} {
 	})
 
 	var inputRows [][]map[string]interface{}
-	for i := 0; i < len(inputFieldsList); i += 2 {
-		end := i + 2
-		if end > len(inputFieldsList) {
-			end = len(inputFieldsList)
+	for i := 0; i < len(inputFieldsList); {
+		current := inputFieldsList[i]
+		isReadOnly := current["Readonly"] == true
+
+		// 如果当前是只读字段，强制独占一行
+		if isReadOnly {
+			inputRows = append(inputRows, []map[string]interface{}{current})
+			i++
+			continue
 		}
-		inputRows = append(inputRows, inputFieldsList[i:end])
+
+		// 尝试和下一个字段合并
+		if i+1 < len(inputFieldsList) {
+			next := inputFieldsList[i+1]
+			nextIsReadOnly := next["Readonly"] == true
+
+			if !nextIsReadOnly {
+				inputRows = append(inputRows, []map[string]interface{}{current, next})
+				i += 2
+				continue
+			}
+		}
+
+		// 无法合并，自己一行
+		inputRows = append(inputRows, []map[string]interface{}{current})
+		i++
 	}
 
 	return map[string]interface{}{
@@ -119,6 +156,7 @@ func (a *Approval) Build() map[string]interface{} {
 			}
 		}),
 		"InputRows": inputRows,
+		"Tips":      tipsList,
 	}
 }
 
