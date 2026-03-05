@@ -1,18 +1,28 @@
 package template
 
 import (
-	"golang.org/x/text/cases"
-	"golang.org/x/text/language"
-	"html/template"
 	"reflect"
 	"regexp"
 	"strings"
 	"time"
+
+	jsoniter "github.com/json-iterator/go"
+
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 type FuncMap map[string]any
 
 var DefaultFuncs = FuncMap{
+	"json": func(v interface{}) string {
+		// 如果是字符串，先处理可能存在的字面量 \n
+		if s, ok := v.(string); ok {
+			v = strings.ReplaceAll(s, "\\n", "\n")
+		}
+		out, _ := jsoniter.ConfigCompatibleWithStandardLibrary.MarshalToString(v)
+		return out
+	},
 	"toUpper": strings.ToUpper,
 	"toLower": strings.ToLower,
 	"title": func(text string) string {
@@ -51,7 +61,7 @@ var DefaultFuncs = FuncMap{
 		v := reflect.ValueOf(slice)
 		return index == v.Len()-1
 	},
-	"safeHTML": func(html string) template.HTML {
-		return template.HTML(html)
+	"safeHTML": func(html string) string {
+		return html
 	},
 }

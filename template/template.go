@@ -3,10 +3,10 @@ package template
 import (
 	"bytes"
 	"embed"
-	"html/template"
 	"io"
 	"io/fs"
 	"path/filepath"
+	"text/template"
 )
 
 //go:embed default/*.tmpl
