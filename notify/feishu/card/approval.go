@@ -137,6 +137,14 @@ func (a *Approval) Build() map[string]interface{} {
 		i++
 	}
 
+	fields := slice.Map(a.Fields, func(idx int, src Field) map[string]interface{} {
+		return map[string]interface{}{
+			"IsShort": src.IsShort,
+			"Tag":     src.Tag,
+			"Content": src.Content,
+		}
+	})
+
 	return map[string]interface{}{
 		"Title":    a.Title,
 		"HideForm": a.HideForm,
@@ -148,16 +156,53 @@ func (a *Approval) Build() map[string]interface{} {
 		}),
 		"WantContent": a.WantContent,
 		"ImageKey":    a.ImageKey,
-		"Fields": slice.Map(a.Fields, func(idx int, src Field) map[string]interface{} {
-			return map[string]interface{}{
-				"IsShort": src.IsShort,
-				"Tag":     src.Tag,
-				"Content": src.Content,
-			}
-		}),
+		"Fields":      fields,
+		// Sections 将原始 Fields 按 IsShort:false 切割成分组，
+		// 供 carbon-copy-sections 模板渲染带 hr 分隔线的结构化卡片。
+		"Sections":  buildSections(a.Fields),
 		"InputRows": inputRows,
 		"Tips":      tipsList,
 	}
+}
+
+// Section 表示卡片中的一个内容分区，包含小标题和其下属的字段列表
+type Section struct {
+	Title  string                   // 分区小标题（lark_md 格式，IsShort:false 的字段内容）
+	Fields []map[string]interface{} // 该分区内的数据字段（IsShort:true），已序列化为模板所需的 map 格式
+}
+
+// buildSections 将原始 []Field 按 IsShort:false 切割为分组。
+// IsShort:false 的字段作为区块小标题，其后连续的 IsShort:true 字段归入该区块。
+// 若开头无标题直接是数据字段，则将其归入一个无标题区块，保持向后兼容。
+func buildSections(raw []Field) []Section {
+	var sections []Section
+	var current *Section
+
+	for _, f := range raw {
+		if !f.IsShort {
+			// IsShort:false → 区块小标题，结束上一个 Section，开启新的
+			if current != nil {
+				sections = append(sections, *current)
+			}
+			current = &Section{Title: f.Content}
+		} else {
+			// IsShort:true → 数据字段，序列化后追加到当前 Section
+			if current == nil {
+				current = &Section{}
+			}
+			current.Fields = append(current.Fields, map[string]interface{}{
+				"IsShort": f.IsShort,
+				"Tag":     f.Tag,
+				"Content": f.Content,
+			})
+		}
+	}
+
+	if current != nil {
+		sections = append(sections, *current)
+	}
+
+	return sections
 }
 
 func (a *Approval) SetImageKey(imageKey string) Builder {

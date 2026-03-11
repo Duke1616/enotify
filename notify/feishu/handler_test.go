@@ -52,7 +52,7 @@ func (s *HandlerTestSuite) TestSendCreate() {
 	// 构造 Create 消息
 	msg := NewCreateBuilder("bcegag66").
 		SetReceiveIDType(ReceiveIDTypeUserID).
-		SetContent(NewFeishuCustomCard(s.tmpl, "feishu-card-callback", card.NewApprovalCardBuilder().
+		SetContent(NewFeishuCustomCard(s.tmpl, "approval", card.NewApprovalCardBuilder().
 			SetToTitle("Handler Test Create").SetToFields([]card.Field{
 			{
 				IsShort: false,
@@ -158,6 +158,44 @@ func (s *HandlerTestSuite) TestSendWithForm() {
 				},
 			}).
 			SetToHideForm(false).Build())).
+		Build()
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
+	defer cancel()
+
+	err := s.handler.Send(ctx, msg)
+	require.NoError(t, err)
+}
+
+// TestSendWithSections 验证 carbon-copy-sections 模板的分组渲染效果。
+// 模拟三个区块：📋 工单信息 / ⚙️ 执行结果 / ✍️ 用户提交，
+// 每个区块之间由 hr 分隔线区分。
+func (s *HandlerTestSuite) TestSendWithSections() {
+	t := s.T()
+
+	// NOTE: IsShort:false 字段作为分组小标题，紧随其后的 IsShort:true 字段归入该分组
+	msg := NewCreateBuilder("bcegag66").
+		SetReceiveIDType(ReceiveIDTypeUserID).
+		SetContent(NewFeishuCustomCard(s.tmpl, "chat", card.NewApprovalCardBuilder().
+			SetToTitle("张三的任务执行结果").
+			SetToFields([]card.Field{
+				// ── 区块一：工单信息 ──
+				{IsShort: false, Tag: "lark_md", Content: "**📋 工单信息**"},
+				{IsShort: true, Tag: "lark_md", Content: "**申请人：**\n张三"},
+				{IsShort: true, Tag: "lark_md", Content: "**工单模版：**\nAgent 发版"},
+				// ── 区块二：执行结果 ──
+				{IsShort: false, Tag: "lark_md", Content: "**⚙️ 执行结果**"},
+				{IsShort: true, Tag: "lark_md", Content: "**前端 Tag：**\n7283cb9c"},
+				{IsShort: true, Tag: "lark_md", Content: "**后端 Tag：**\n42ca352a"},
+				{IsShort: true, Tag: "lark_md", Content: "**状态：**\n<font color='green'>✅ success</font>"},
+				{IsShort: true, Tag: "lark_md", Content: "**环境：**\n前端, 后端"},
+				{IsShort: true, Tag: "lark_md", Content: "**版本详情：**\n完善版本细节"},
+				// ── 区块三：用户提交 ──
+				{IsShort: false, Tag: "lark_md", Content: "**✍️ 用户提交**"},
+				{IsShort: true, Tag: "lark_md", Content: "**版本：**\nv1.0.5"},
+				{IsShort: true, Tag: "lark_md", Content: "**发布说明：**\n本次为常规迭代"},
+			}).
+			SetToHideForm(true).Build())).
 		Build()
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
