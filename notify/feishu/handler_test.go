@@ -173,25 +173,26 @@ func (s *HandlerTestSuite) TestSendWithForm() {
 func (s *HandlerTestSuite) TestSendWithSections() {
 	t := s.T()
 
-	// NOTE: IsShort:false 字段作为分组小标题，紧随其后的 IsShort:true 字段归入该分组
-	msg := NewCreateBuilder("bcegag66").
-		SetReceiveIDType(ReceiveIDTypeUserID).
-		SetContent(NewFeishuCustomCard(s.tmpl, "chat", card.NewApprovalCardBuilder().
-			SetToTitle("张三的任务执行结果").
-			SetToFields([]card.Field{
+	// NOTE: IsDivider:true 字段作为分组小标题，其后的普通字段归入该分组
+	msg := NewCreateBuilder("oc_3015666bb172ef3d3a98178cd724dc00").
+		SetReceiveIDType(ReceiveIDTypeChatID).
+		SetContent(NewFeishuCustomCard(s.tmpl, "chat", card.NewApprovalCardBuilder(). // 使用 chat 模板
+												SetToTitle("栾凯朝的Agent 发版执行结果").
+												SetToFields([]card.Field{
 				// ── 区块一：工单信息 ──
-				{IsShort: false, Tag: "lark_md", Content: "**📋 工单信息**"},
-				{IsShort: true, Tag: "lark_md", Content: "**申请人：**\n张三"},
+				{IsDivider: true, Tag: "lark_md", Content: "**📋 工单信息**"},
+				{IsShort: true, Tag: "lark_md", Content: "**申请人：**\n栾凯朝"},
 				{IsShort: true, Tag: "lark_md", Content: "**工单模版：**\nAgent 发版"},
+				{IsShort: false, Tag: "lark_md", Content: "**长文本测试：**\n这个长文本IsShort是false，但不应该成为分隔标题"},
 				// ── 区块二：执行结果 ──
-				{IsShort: false, Tag: "lark_md", Content: "**⚙️ 执行结果**"},
+				{IsDivider: true, Tag: "lark_md", Content: "**⚙️ 执行结果**"},
 				{IsShort: true, Tag: "lark_md", Content: "**前端 Tag：**\n7283cb9c"},
 				{IsShort: true, Tag: "lark_md", Content: "**后端 Tag：**\n42ca352a"},
 				{IsShort: true, Tag: "lark_md", Content: "**状态：**\n<font color='green'>✅ success</font>"},
 				{IsShort: true, Tag: "lark_md", Content: "**环境：**\n前端, 后端"},
-				{IsShort: true, Tag: "lark_md", Content: "**版本详情：**\n完善版本细节"},
+				{IsShort: false, Tag: "lark_md", Content: "**版本详情：**\n完善版本细节"},
 				// ── 区块三：用户提交 ──
-				{IsShort: false, Tag: "lark_md", Content: "**✍️ 用户提交**"},
+				{IsDivider: true, Tag: "lark_md", Content: "**✍️ 用户提交**"},
 				{IsShort: true, Tag: "lark_md", Content: "**版本：**\nv1.0.5"},
 				{IsShort: true, Tag: "lark_md", Content: "**发布说明：**\n本次为常规迭代"},
 			}).

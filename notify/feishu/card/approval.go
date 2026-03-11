@@ -58,9 +58,10 @@ type Builder interface {
 }
 
 type Field struct {
-	IsShort bool   `json:"is_short"`
-	Tag     string `json:"tag"`
-	Content string `json:"content"`
+	IsShort   bool   `json:"is_short"`
+	IsDivider bool   `json:"is_divider"` // 当置为 true 时，表示该字段是一个区块小标题（用于生成带 hr 的新 Section）
+	Tag       string `json:"tag"`
+	Content   string `json:"content"`
 }
 
 type Approval struct {
@@ -171,22 +172,21 @@ type Section struct {
 	Fields []map[string]interface{} // 该分区内的数据字段（IsShort:true），已序列化为模板所需的 map 格式
 }
 
-// buildSections 将原始 []Field 按 IsShort:false 切割为分组。
-// IsShort:false 的字段作为区块小标题，其后连续的 IsShort:true 字段归入该区块。
-// 若开头无标题直接是数据字段，则将其归入一个无标题区块，保持向后兼容。
+// buildSections 将原始 []Field 按照 IsDivider 切割为分组。
+// IsDivider:true 的字段作为区块小标题。
 func buildSections(raw []Field) []Section {
 	var sections []Section
 	var current *Section
 
 	for _, f := range raw {
-		if !f.IsShort {
-			// IsShort:false → 区块小标题，结束上一个 Section，开启新的
+		if f.IsDivider {
+			// IsDivider:true → 区块小标题，结束上一个 Section，开启新的
 			if current != nil {
 				sections = append(sections, *current)
 			}
 			current = &Section{Title: f.Content}
 		} else {
-			// IsShort:true → 数据字段，序列化后追加到当前 Section
+			// 普通数据字段，序列化后追加到当前 Section
 			if current == nil {
 				current = &Section{}
 			}
