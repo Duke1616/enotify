@@ -175,13 +175,13 @@ func (s *HandlerTestSuite) TestSendWithSections() {
 
 	// NOTE: IsDivider:true 字段作为分组小标题，其后的普通字段归入该分组
 	msg := NewCreateBuilder("oc_3015666bb172ef3d3a98178cd724dc00").
-		SetReceiveIDType(ReceiveIDTypeChatID).
+		SetReceiveIDType(ReceiveIDTypeUserID).
 		SetContent(NewFeishuCustomCard(s.tmpl, "chat", card.NewApprovalCardBuilder(). // 使用 chat 模板
-												SetToTitle("栾凯朝的Agent 发版执行结果").
-												SetToFields([]card.Field{
+			SetToTitle("发版执行结果").
+			SetToFields([]card.Field{
 				// ── 区块一：工单信息 ──
 				{IsDivider: true, Tag: "lark_md", Content: "**📋 工单信息**"},
-				{IsShort: true, Tag: "lark_md", Content: "**申请人：**\n栾凯朝"},
+				{IsShort: true, Tag: "lark_md", Content: "**申请人：**\n张三"},
 				{IsShort: true, Tag: "lark_md", Content: "**工单模版：**\nAgent 发版"},
 				{IsShort: false, Tag: "lark_md", Content: "**长文本测试：**\n这个长文本IsShort是false，但不应该成为分隔标题"},
 				// ── 区块二：执行结果 ──
